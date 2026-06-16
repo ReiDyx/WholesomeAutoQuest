@@ -9,45 +9,45 @@
   <Blackspots />
   <Mailboxes />
   <Vendors>
-    <Vendor Name="Corina Steele" Entry="54" Type="Repair" X="-9464.87" Y="93.9896" Z="58.5271" />
-    <Vendor Name="Andrew Krighton" Entry="2046" Type="Repair" X="-9462.29" Y="87.8151" Z="58.4211" />
+    <Vendor Name="Janos Hammerknuckle" Entry="78" Type="Repair" X="-8909.46" Y="-104.163" Z="82.0314" />
+    <Vendor Name="Godric Rothgar" Entry="1213" Type="Repair" X="-8898.23" Y="-119.838" Z="82.016" />
     <Vendor Name="Smith Argus" Entry="514" Type="Repair" X="-9456.65" Y="87.8553" Z="58.4271" />
-    <Vendor Name="Homer Stonefield" Entry="894" Type="Food" X="-9858.46" Y="365.972" Z="36.3371" />
-    <Vendor Name="Kira Songshine" Entry="3937" Type="Food" X="-9493.63" Y="67.1881" Z="56.2467" />
-    <Vendor Name="Melika Isenstrider" Entry="6778" Type="Food" X="-9471.94" Y="27.4077" Z="56.4228" />
+    <Vendor Name="Jason Mathers" Entry="383" Type="Food" X="-9378.89" Y="-111.923" Z="59.006" />
+    <Vendor Name="Lee Brown" Entry="1651" Type="Food" X="-9382.08" Y="-117.005" Z="58.9841" />
+    <Vendor Name="Jasper Fel" Entry="1325" Type="Food" X="-8807.56" Y="328.195" Z="102.336" />
+    <Vendor Name="Khelden Bremen" Entry="198" Type="Train" X="-8851.57" Y="-188.234" Z="89.4958" TrainClass="Mage" />
     <Vendor Name="Zaldimar Wefhellt" Entry="328" Type="Train" X="-9471.67" Y="34.451" Z="63.9038" TrainClass="Mage" />
-    <Vendor Name="Maginor Dumas" Entry="331" Type="Train" X="-9012" Y="867.595" Z="29.621" TrainClass="Mage" />
   </Vendors>
-  <Quest Id="47" Name="Gold Dust Exchange">
-    <Objective Type="CollectItem" ItemId="773" CollectCount="10">
+  <Quest Id="7" Name="Kobold Camp Cleanup">
+    <Objective Type="KillMob" MobId="6" KillCount="8">
+      <Hotspots>
+        <Hotspot X="-8783.05" Y="-161.565" Z="82.0352" />
+        <Hotspot X="-8774.13" Y="-184.494" Z="83.1764" />
+        <Hotspot X="-8794.45" Y="-170.399" Z="81.5514" />
+        <Hotspot X="-8794.96" Y="-134.15" Z="83.0352" />
+        <Hotspot X="-8789.91" Y="-143.313" Z="82.8382" />
+        <Hotspot X="-8768.46" Y="-176.434" Z="83.4446" />
+        <Hotspot X="-8752.95" Y="-160.776" Z="84.377" />
+        <Hotspot X="-8779.8" Y="-195.355" Z="84.0514" />
+        <Hotspot X="-8775.9" Y="-148.466" Z="81.4102" />
+        <Hotspot X="-8785.46" Y="-171.229" Z="81.6764" />
+      </Hotspots>
+    </Objective>
+  </Quest>
+  <Quest Id="18" Name="Brotherhood of Thieves">
+    <Objective Type="CollectItem" ItemId="752" CollectCount="8">
       <Hotspots />
     </Objective>
   </Quest>
-  <Quest Id="60" Name="Kobold Candles">
-    <Objective Type="CollectItem" ItemId="772" CollectCount="8">
-      <Hotspots />
-    </Objective>
-  </Quest>
-  <Quest Id="3903" Name="Milly Osworth" />
-  <Quest Id="85" Name="Lost Necklace" />
-  <Quest Id="88" Name="Princess Must Die!">
-    <Objective Type="CollectItem" ItemId="1006" CollectCount="1">
-      <Hotspots />
-    </Objective>
-  </Quest>
+  <Quest Id="5261" Name="Eagan Peltskinner" />
   <QuestOrder>
-    <PickUp QuestName="Gold Dust Exchange" QuestId="47" GiverName="Remy &quot;Two Times&quot;" GiverId="241" />
-    <PickUp QuestName="Kobold Candles" QuestId="60" GiverName="William Pestle" GiverId="253" />
-    <PickUp QuestName="Milly Osworth" QuestId="3903" GiverName="Deputy Willem" GiverId="823" />
-    <PickUp QuestName="Lost Necklace" QuestId="85" GiverName="&quot;Auntie&quot; Bernice Stonefield" GiverId="246" />
-    <PickUp QuestName="Princess Must Die!" QuestId="88" GiverName="Ma Stonefield" GiverId="244" />
-    <Objective QuestName="Gold Dust Exchange" QuestId="47" Type="CollectItem" ItemId="773" CollectCount="10" MobId="40" />
-    <Objective QuestName="Kobold Candles" QuestId="60" Type="CollectItem" ItemId="772" CollectCount="8" MobId="40" />
-    <Objective QuestName="Princess Must Die!" QuestId="88" Type="CollectItem" ItemId="1006" CollectCount="1" MobId="330" />
-    <TurnIn QuestName="Gold Dust Exchange" QuestId="47" TurnInName="Remy &quot;Two Times&quot;" TurnInId="241" />
-    <TurnIn QuestName="Kobold Candles" QuestId="60" TurnInName="William Pestle" TurnInId="253" />
-    <TurnIn QuestName="Milly Osworth" QuestId="3903" TurnInName="Milly Osworth" TurnInId="9296" />
-    <TurnIn QuestName="Lost Necklace" QuestId="85" TurnInName="Billy Maclure" TurnInId="247" />
-    <TurnIn QuestName="Princess Must Die!" QuestId="88" TurnInName="Ma Stonefield" TurnInId="244" />
+    <PickUp QuestName="Kobold Camp Cleanup" QuestId="7" GiverName="Marshal McBride" GiverId="197" />
+    <PickUp QuestName="Brotherhood of Thieves" QuestId="18" GiverName="Deputy Willem" GiverId="823" />
+    <PickUp QuestName="Eagan Peltskinner" QuestId="5261" GiverName="Deputy Willem" GiverId="823" />
+    <Objective QuestName="Kobold Camp Cleanup" QuestId="7" Type="KillMob" MobId="6" KillCount="8" />
+    <Objective QuestName="Brotherhood of Thieves" QuestId="18" Type="CollectItem" ItemId="752" CollectCount="8" MobId="38" />
+    <TurnIn QuestName="Kobold Camp Cleanup" QuestId="7" TurnInName="Marshal McBride" TurnInId="197" />
+    <TurnIn QuestName="Brotherhood of Thieves" QuestId="18" TurnInName="Deputy Willem" TurnInId="823" />
+    <TurnIn QuestName="Eagan Peltskinner" QuestId="5261" TurnInName="Eagan Peltskinner" TurnInId="196" />
   </QuestOrder>
 </HBProfile>

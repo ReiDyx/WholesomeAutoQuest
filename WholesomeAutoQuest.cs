@@ -28,6 +28,7 @@ namespace WholesomeAQ
         private bool _dataReady;
         private bool _vendorDataReady;
         private DateTime _lastScanTime = DateTime.MinValue;
+        private bool _restartAfterStop;
         private string _profilePath;
         private string _vendorBlacklistPath;
         private Timer _restartTimer;
@@ -35,8 +36,6 @@ namespace WholesomeAQ
         private double _anchorX, _anchorY, _anchorZ;
         private bool _anchorSet;
         private DateTime _lastMovedTime = DateTime.Now;
-        private DateTime _lastProgressTime = DateTime.Now;
-        private DateTime _lastBlackspotTime = DateTime.MinValue;
         private bool _wasStuck;
         private bool _stuckLogged;
 
@@ -74,8 +73,10 @@ namespace WholesomeAQ
                         if (!TreeRoot.IsRunning)
                         {
                             if (StyxWoW.Me.Combat)
+                            {
                                 Log("Stopped while in combat — resuming instantly");
-                            TreeRoot.Start();
+                                TreeRoot.Start();
+                            }
                             DoScan();
                         }
                         else if (_lastScanTime != DateTime.MinValue
@@ -83,7 +84,11 @@ namespace WholesomeAQ
                               && !StyxWoW.Me.Combat)
                         {
                             _lastScanTime = DateTime.Now;
+                            _restartAfterStop = true;
                             TreeRoot.Stop();
+                            DoScan();
+                            TreeRoot.Start();
+                            _restartAfterStop = false;
                         }
                     }
                     catch { }
@@ -93,7 +98,9 @@ namespace WholesomeAQ
 
             base.Start();
 
+            _restartAfterStop = true;
             DoScan();
+            _restartAfterStop = false;
 
             Log(_dataReady ? "Started with quest data loaded." : "Started. No quest data loaded.");
         }
@@ -148,7 +155,7 @@ namespace WholesomeAQ
                                 return;
                             }
                         }
-                        else
+                        else if (_restartAfterStop)
                         {
                             TreeRoot.Start();
                         }
@@ -175,7 +182,6 @@ namespace WholesomeAQ
                     _anchorX = loc.X;
                     _anchorY = loc.Y;
                     _anchorZ = loc.Z;
-                    _lastProgressTime = DateTime.Now;
                     _anchorSet = true;
                 }
 
@@ -187,7 +193,6 @@ namespace WholesomeAQ
                     _anchorX = loc.X;
                     _anchorY = loc.Y;
                     _anchorZ = loc.Z;
-                    _lastProgressTime = DateTime.Now;
                 }
 
                 if (Math.Abs(loc.X - _lastX) > 0.1 || Math.Abs(loc.Y - _lastY) > 0.1 || Math.Abs(loc.Z - _lastZ) > 0.1)
@@ -202,16 +207,6 @@ namespace WholesomeAQ
                 else
                 {
                     double stuckSec = (DateTime.Now - _lastMovedTime).TotalSeconds;
-                    double progressSec = (DateTime.Now - _lastProgressTime).TotalSeconds;
-
-                    if (StuckDetector.IsStuck && progressSec >= 10 && (DateTime.Now - _lastBlackspotTime).TotalSeconds > 10)
-                    {
-                        _lastBlackspotTime = DateTime.Now;
-                        BlackspotManager.AddBlackspot(loc, 10f, 5f);
-                        BlackspotManager.EnsureBlackspotsMarked();
-                        Navigator.Clear();
-                        Log($"No progress for 10s — added 10yd blackspot at ({loc.X:F1}, {loc.Y:F1}, {loc.Z:F1})");
-                    }
 
                     if (stuckSec > 30 && !_wasStuck)
                     {
