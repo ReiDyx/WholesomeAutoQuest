@@ -139,12 +139,6 @@ namespace WholesomeAQ
                             return;
                         }
 
-                        if (string.IsNullOrEmpty(_scheduler.CurrentProfilePath))
-                        {
-                            Log("Profile path is null — skipping refresh");
-                            return;
-                        }
-
                         ProfileManager.LoadNew(_scheduler.CurrentProfilePath);
                         if (TreeRoot.IsRunning)
                         {
@@ -161,13 +155,6 @@ namespace WholesomeAQ
                             TreeRoot.Start();
                         }
                         Log($"Profile refreshed - {_scheduler.LastStatus}");
-                        if (_dataLoader.Database != null && _scheduler.ActiveQuestIds.Count > 0)
-                        {
-                            var levels = _dataLoader.Database.Quests
-                                .Where(q => _scheduler.ActiveQuestIds.Contains(q.Id))
-                                .Select(q => $"{q.Id} (Lvl{q.QuestLevel})");
-                            Log("Picking up: " + string.Join(", ", levels));
-                        }
                     }
                 }
             }

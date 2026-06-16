@@ -1,6 +1,6 @@
 
 <HBProfile>
-  <Name>WholesomeAQ - Elwynn Forest</Name>
+  <Name>WholesomeAQ - Teldrassil</Name>
   <MinLevel>1</MinLevel>
   <MaxLevel>80</MaxLevel>
   <MinDurability>0.2</MinDurability>
@@ -9,21 +9,37 @@
   <Blackspots />
   <Mailboxes />
   <Vendors>
-    <Vendor Name="Godric Rothgar" Entry="1213" Type="Repair" X="-8898.23" Y="-119.838" Z="82.016" />
-    <Vendor Name="Janos Hammerknuckle" Entry="78" Type="Repair" X="-8909.46" Y="-104.163" Z="82.0314" />
-    <Vendor Name="Smith Argus" Entry="514" Type="Repair" X="-9456.65" Y="87.8553" Z="58.4271" />
-    <Vendor Name="Jason Mathers" Entry="383" Type="Food" X="-9378.89" Y="-111.923" Z="59.006" />
-    <Vendor Name="Lee Brown" Entry="1651" Type="Food" X="-9382.08" Y="-117.005" Z="58.9841" />
-    <Vendor Name="Jasper Fel" Entry="1325" Type="Food" X="-8807.56" Y="328.195" Z="102.336" />
-    <Vendor Name="Khelden Bremen" Entry="198" Type="Train" X="-8851.57" Y="-188.234" Z="89.4958" TrainClass="Mage" />
-    <Vendor Name="Zaldimar Wefhellt" Entry="328" Type="Train" X="-9471.67" Y="34.451" Z="63.9038" TrainClass="Mage" />
+    <Vendor Name="Andiss" Entry="3592" Type="Repair" X="10479.2" Y="826.638" Z="1322.83" />
+    <Vendor Name="Khardan Proudblade" Entry="3588" Type="Repair" X="10485" Y="824.842" Z="1322.83" />
+    <Vendor Name="Cylania" Entry="4164" Type="Repair" X="9911.11" Y="2311.39" Z="1330.87" />
+    <Vendor Name="Nyoma" Entry="4265" Type="Food" X="9752.11" Y="902.695" Z="1295.6" />
+    <Vendor Name="Zarrin" Entry="6286" Type="Food" X="9751.02" Y="906.196" Z="1295.6" />
+    <Vendor Name="Innkeeper Keldamyr" Entry="6736" Type="Food" X="9802.21" Y="982.608" Z="1313.98" />
+    <Vendor Name="Alyissia" Entry="3593" Type="Train" X="10526.6" Y="778.086" Z="1329.68" TrainClass="Warrior" />
+    <Vendor Name="Sildanair" Entry="4089" Type="Train" X="9940.36" Y="2284.55" Z="1341.48" TrainClass="Warrior" />
   </Vendors>
-  <Quest Id="783" Name="A Threat Within" />
-  <Quest Id="2158" Name="Rest and Relaxation" />
+  <Quest Id="997" Name="Denalan's Earth" />
+  <Quest Id="2159" Name="Dolanaar Delivery" />
+  <Quest Id="2438" Name="The Emerald Dreamcatcher">
+    <Objective Type="CollectItem" ItemId="8048" CollectCount="1">
+      <CollectFrom>
+        <GameObject Name="Tallonkai's Dresser" Id="126158" />
+      </CollectFrom>
+      <Hotspots>
+        <Hotspot X="9806.74" Y="351.422" Z="1308.46" />
+      </Hotspots>
+    </Objective>
+  </Quest>
+  <Quest Id="4495" Name="A Good Friend" />
   <QuestOrder>
-    <PickUp QuestName="A Threat Within" QuestId="783" GiverName="Deputy Willem" GiverId="823" />
-    <PickUp QuestName="Rest and Relaxation" QuestId="2158" GiverName="Falkhaan Isenstrider" GiverId="6774" />
-    <TurnIn QuestName="A Threat Within" QuestId="783" TurnInName="Marshal McBride" TurnInId="197" />
-    <TurnIn QuestName="Rest and Relaxation" QuestId="2158" TurnInName="Innkeeper Farley" TurnInId="295" />
+    <PickUp QuestName="Denalan's Earth" QuestId="997" GiverName="Syral Bladeleaf" GiverId="2083" />
+    <PickUp QuestName="Dolanaar Delivery" QuestId="2159" GiverName="Porthannius" GiverId="6780" />
+    <PickUp QuestName="The Emerald Dreamcatcher" QuestId="2438" GiverName="Tallonkai Swiftroot" GiverId="3567" />
+    <PickUp QuestName="A Good Friend" QuestId="4495" GiverName="Dirania Silvershine" GiverId="8583" />
+    <Objective QuestName="The Emerald Dreamcatcher" QuestId="2438" Type="CollectItem" ItemId="8048" CollectCount="1" />
+    <TurnIn QuestName="Denalan's Earth" QuestId="997" TurnInName="Denalan" TurnInId="2080" />
+    <TurnIn QuestName="Dolanaar Delivery" QuestId="2159" TurnInName="Innkeeper Keldamyr" TurnInId="6736" />
+    <TurnIn QuestName="The Emerald Dreamcatcher" QuestId="2438" TurnInName="Tallonkai Swiftroot" TurnInId="3567" />
+    <TurnIn QuestName="A Good Friend" QuestId="4495" TurnInName="Iverron" TurnInId="8584" />
   </QuestOrder>
 </HBProfile>

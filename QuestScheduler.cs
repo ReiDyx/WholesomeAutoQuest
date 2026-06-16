@@ -154,8 +154,8 @@ namespace WholesomeAQ
                 if (me.Level < qe.MinLevel)
                     continue;
 
-                int qMin = 1;
-                int qMax = me.Level + 3;
+                int qMin = Math.Max(1, me.Level - 2);
+                int qMax = me.Level;
                 if (qe.QuestLevel > 0 && (qe.QuestLevel < qMin || qe.QuestLevel > qMax))
                     continue;
 
@@ -340,10 +340,10 @@ namespace WholesomeAQ
 
             if (allQuests.Count == 0)
             {
-                int nextThreshold = _scanThreshold + _settings.ScanStep;
-                _scanThreshold = nextThreshold < 0 ? _settings.ScanMaxDistance : nextThreshold;
+                _scanThreshold += _settings.ScanStep;
                 if (_scanThreshold >= _settings.ScanMaxDistance)
                 {
+                    _scanThreshold = _settings.ScanStartDistance;
                     LastStatus = "No quests available";
                     CurrentProfilePath = _profileBuilder.BuildEmptyProfile(me.ZoneText, me.Level, CurrentVendors);
                     ActiveQuestIds = new HashSet<int>();
