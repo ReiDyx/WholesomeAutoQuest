@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Styx;
+using Styx.Logic.AreaManagement;
 using Styx.Logic.POI;
 using Styx.Helpers;
 using Styx.Logic.AreaManagement;
@@ -52,6 +53,8 @@ namespace WholesomeAQ
 
         public override void Start()
         {
+            if (StyxWoW.IsInGame && StyxWoW.Me != null && StyxWoW.AreaManager.CurrentGrindArea == null)
+                StyxWoW.AreaManager.SetArea(new GrindArea { Name = "WAQ" });
             _profilePath = FindProfilePath();
             _profileBuilder = new ProfileBuilder(_profilePath);
             _dataLoader = new DataLoader();
@@ -73,11 +76,8 @@ namespace WholesomeAQ
                     {
                         if (!TreeRoot.IsRunning)
                         {
-                            if (StyxWoW.Me.Combat)
-                            {
-                                Log("Stopped while in combat — resuming instantly");
+                            if (!StyxWoW.Me.Combat)
                                 TreeRoot.Start();
-                            }
                             DoScan();
                         }
                         else if (_lastScanTime != DateTime.MinValue

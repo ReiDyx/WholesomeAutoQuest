@@ -53,7 +53,7 @@ namespace WholesomeAQ
         public bool ScanAndBuildProfile(LocalPlayer me)
         {
             _completedQuests = new HashSet<uint>(
-                Questing.GetCompletedQuestIDs().Select(id => (uint)id)
+                me.QuestLog.GetCompletedQuests() ?? Enumerable.Empty<uint>()
             );
             _lastScan = DateTime.Now;
 
@@ -154,7 +154,7 @@ namespace WholesomeAQ
                 if (me.Level < qe.MinLevel)
                     continue;
 
-                int qMin = Math.Max(1, me.Level - 2);
+                int qMin = Math.Max(1, me.Level - 7);
                 int qMax = me.Level;
                 if (qe.QuestLevel > 0 && (qe.QuestLevel < qMin || qe.QuestLevel > qMax))
                     continue;
@@ -317,7 +317,7 @@ namespace WholesomeAQ
         public bool ScanAndRefresh(LocalPlayer me)
         {
             _completedQuests = new HashSet<uint>(
-                Questing.GetCompletedQuestIDs().Select(id => (uint)id)
+                me.QuestLog.GetCompletedQuests() ?? Enumerable.Empty<uint>()
             );
             _lastScan = DateTime.Now;
 

@@ -1,6 +1,6 @@
 
 <HBProfile>
-  <Name>WholesomeAQ - Teldrassil</Name>
+  <Name>WholesomeAQ - Elwynn Forest</Name>
   <MinLevel>1</MinLevel>
   <MaxLevel>80</MaxLevel>
   <MinDurability>0.2</MinDurability>
@@ -9,37 +9,42 @@
   <Blackspots />
   <Mailboxes />
   <Vendors>
-    <Vendor Name="Andiss" Entry="3592" Type="Repair" X="10479.2" Y="826.638" Z="1322.83" />
-    <Vendor Name="Khardan Proudblade" Entry="3588" Type="Repair" X="10485" Y="824.842" Z="1322.83" />
-    <Vendor Name="Cylania" Entry="4164" Type="Repair" X="9911.11" Y="2311.39" Z="1330.87" />
-    <Vendor Name="Nyoma" Entry="4265" Type="Food" X="9752.11" Y="902.695" Z="1295.6" />
-    <Vendor Name="Zarrin" Entry="6286" Type="Food" X="9751.02" Y="906.196" Z="1295.6" />
-    <Vendor Name="Innkeeper Keldamyr" Entry="6736" Type="Food" X="9802.21" Y="982.608" Z="1313.98" />
-    <Vendor Name="Alyissia" Entry="3593" Type="Train" X="10526.6" Y="778.086" Z="1329.68" TrainClass="Warrior" />
-    <Vendor Name="Sildanair" Entry="4089" Type="Train" X="9940.36" Y="2284.55" Z="1341.48" TrainClass="Warrior" />
+    <Vendor Name="Corina Steele" Entry="54" Type="Repair" X="-9464.87" Y="93.9896" Z="58.5271" />
+    <Vendor Name="Andrew Krighton" Entry="2046" Type="Repair" X="-9462.29" Y="87.8151" Z="58.4211" />
+    <Vendor Name="Smith Argus" Entry="514" Type="Repair" X="-9456.65" Y="87.8553" Z="58.4271" />
+    <Vendor Name="Homer Stonefield" Entry="894" Type="Food" X="-9858.46" Y="365.972" Z="36.3371" />
+    <Vendor Name="Kira Songshine" Entry="3937" Type="Food" X="-9493.63" Y="67.1881" Z="56.2467" />
+    <Vendor Name="Melika Isenstrider" Entry="6778" Type="Food" X="-9471.94" Y="27.4077" Z="56.4228" />
+    <Vendor Name="Zaldimar Wefhellt" Entry="328" Type="Train" X="-9471.67" Y="34.451" Z="63.9038" TrainClass="Mage" />
+    <Vendor Name="Maginor Dumas" Entry="331" Type="Train" X="-9012" Y="867.595" Z="29.621" TrainClass="Mage" />
   </Vendors>
-  <Quest Id="997" Name="Denalan's Earth" />
-  <Quest Id="2159" Name="Dolanaar Delivery" />
-  <Quest Id="2438" Name="The Emerald Dreamcatcher">
-    <Objective Type="CollectItem" ItemId="8048" CollectCount="1">
-      <CollectFrom>
-        <GameObject Name="Tallonkai's Dresser" Id="126158" />
-      </CollectFrom>
-      <Hotspots>
-        <Hotspot X="9806.74" Y="351.422" Z="1308.46" />
-      </Hotspots>
+  <Quest Id="47" Name="Gold Dust Exchange">
+    <Objective Type="CollectItem" ItemId="773" CollectCount="10">
+      <Hotspots />
     </Objective>
   </Quest>
-  <Quest Id="4495" Name="A Good Friend" />
+  <Quest Id="60" Name="Kobold Candles">
+    <Objective Type="CollectItem" ItemId="772" CollectCount="8">
+      <Hotspots />
+    </Objective>
+  </Quest>
+  <Quest Id="3903" Name="Milly Osworth" />
+  <Quest Id="88" Name="Princess Must Die!">
+    <Objective Type="CollectItem" ItemId="1006" CollectCount="1">
+      <Hotspots />
+    </Objective>
+  </Quest>
   <QuestOrder>
-    <PickUp QuestName="Denalan's Earth" QuestId="997" GiverName="Syral Bladeleaf" GiverId="2083" />
-    <PickUp QuestName="Dolanaar Delivery" QuestId="2159" GiverName="Porthannius" GiverId="6780" />
-    <PickUp QuestName="The Emerald Dreamcatcher" QuestId="2438" GiverName="Tallonkai Swiftroot" GiverId="3567" />
-    <PickUp QuestName="A Good Friend" QuestId="4495" GiverName="Dirania Silvershine" GiverId="8583" />
-    <Objective QuestName="The Emerald Dreamcatcher" QuestId="2438" Type="CollectItem" ItemId="8048" CollectCount="1" />
-    <TurnIn QuestName="Denalan's Earth" QuestId="997" TurnInName="Denalan" TurnInId="2080" />
-    <TurnIn QuestName="Dolanaar Delivery" QuestId="2159" TurnInName="Innkeeper Keldamyr" TurnInId="6736" />
-    <TurnIn QuestName="The Emerald Dreamcatcher" QuestId="2438" TurnInName="Tallonkai Swiftroot" TurnInId="3567" />
-    <TurnIn QuestName="A Good Friend" QuestId="4495" TurnInName="Iverron" TurnInId="8584" />
+    <PickUp QuestName="Gold Dust Exchange" QuestId="47" GiverName="Remy &quot;Two Times&quot;" GiverId="241" />
+    <PickUp QuestName="Kobold Candles" QuestId="60" GiverName="William Pestle" GiverId="253" />
+    <PickUp QuestName="Milly Osworth" QuestId="3903" GiverName="Deputy Willem" GiverId="823" />
+    <PickUp QuestName="Princess Must Die!" QuestId="88" GiverName="Ma Stonefield" GiverId="244" />
+    <Objective QuestName="Gold Dust Exchange" QuestId="47" Type="CollectItem" ItemId="773" CollectCount="10" MobId="40" />
+    <Objective QuestName="Kobold Candles" QuestId="60" Type="CollectItem" ItemId="772" CollectCount="8" MobId="40" />
+    <Objective QuestName="Princess Must Die!" QuestId="88" Type="CollectItem" ItemId="1006" CollectCount="1" MobId="330" />
+    <TurnIn QuestName="Gold Dust Exchange" QuestId="47" TurnInName="Remy &quot;Two Times&quot;" TurnInId="241" />
+    <TurnIn QuestName="Kobold Candles" QuestId="60" TurnInName="William Pestle" TurnInId="253" />
+    <TurnIn QuestName="Milly Osworth" QuestId="3903" TurnInName="Milly Osworth" TurnInId="9296" />
+    <TurnIn QuestName="Princess Must Die!" QuestId="88" TurnInName="Ma Stonefield" TurnInId="244" />
   </QuestOrder>
 </HBProfile>
