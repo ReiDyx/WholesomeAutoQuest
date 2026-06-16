@@ -29,6 +29,7 @@
     </Objective>
   </Quest>
   <Quest Id="3903" Name="Milly Osworth" />
+  <Quest Id="85" Name="Lost Necklace" />
   <Quest Id="88" Name="Princess Must Die!">
     <Objective Type="CollectItem" ItemId="1006" CollectCount="1">
       <Hotspots />
@@ -38,6 +39,7 @@
     <PickUp QuestName="Gold Dust Exchange" QuestId="47" GiverName="Remy &quot;Two Times&quot;" GiverId="241" />
     <PickUp QuestName="Kobold Candles" QuestId="60" GiverName="William Pestle" GiverId="253" />
     <PickUp QuestName="Milly Osworth" QuestId="3903" GiverName="Deputy Willem" GiverId="823" />
+    <PickUp QuestName="Lost Necklace" QuestId="85" GiverName="&quot;Auntie&quot; Bernice Stonefield" GiverId="246" />
     <PickUp QuestName="Princess Must Die!" QuestId="88" GiverName="Ma Stonefield" GiverId="244" />
     <Objective QuestName="Gold Dust Exchange" QuestId="47" Type="CollectItem" ItemId="773" CollectCount="10" MobId="40" />
     <Objective QuestName="Kobold Candles" QuestId="60" Type="CollectItem" ItemId="772" CollectCount="8" MobId="40" />
@@ -45,6 +47,7 @@
     <TurnIn QuestName="Gold Dust Exchange" QuestId="47" TurnInName="Remy &quot;Two Times&quot;" TurnInId="241" />
     <TurnIn QuestName="Kobold Candles" QuestId="60" TurnInName="William Pestle" TurnInId="253" />
     <TurnIn QuestName="Milly Osworth" QuestId="3903" TurnInName="Milly Osworth" TurnInId="9296" />
+    <TurnIn QuestName="Lost Necklace" QuestId="85" TurnInName="Billy Maclure" TurnInId="247" />
     <TurnIn QuestName="Princess Must Die!" QuestId="88" TurnInName="Ma Stonefield" TurnInId="244" />
   </QuestOrder>
 </HBProfile>
