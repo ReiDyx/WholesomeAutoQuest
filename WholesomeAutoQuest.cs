@@ -9,6 +9,7 @@ using Styx.Helpers;
 using Styx.Logic.AreaManagement;
 using Styx.Logic.BehaviorTree;
 using Styx.Logic.Inventory.Frames.Merchant;
+using Styx.Logic.Inventory.Frames.Trainer;
 using Styx.Logic.Pathing;
 using Styx.Logic.Profiles;
 using Bots.Quest.QuestOrder;

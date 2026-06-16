@@ -24,7 +24,8 @@ namespace WholesomeAQ
             string zoneName,
             string playerName,
             int playerLevel,
-            List<VendorEntry> vendors = null)
+            List<VendorEntry> vendors = null,
+            HashSet<int> preTurninIds = null)
         {
             XDocument doc = new XDocument(
                 new XElement("HBProfile",
@@ -141,8 +142,29 @@ namespace WholesomeAQ
 
             XElement questOrder = new XElement("QuestOrder");
 
+            if (preTurninIds != null && preTurninIds.Count > 0)
+            {
+                foreach (QuestEntry qe in quests.Where(q => preTurninIds.Contains(q.Id)))
+                {
+                    QuestEnderEntry ender = db.QuestEnders
+                        .FirstOrDefault(qe2 => qe2.QuestId == qe.Id);
+                    if (ender != null)
+                    {
+                        questOrder.Add(new XElement("TurnIn",
+                            new XAttribute("QuestName", qe.Name),
+                            new XAttribute("QuestId", qe.Id),
+                            new XAttribute("TurnInName", ender.EnderName),
+                            new XAttribute("TurnInId", ender.EnderId)
+                        ));
+                    }
+                }
+            }
+
             foreach (QuestEntry qe in quests)
             {
+                if (preTurninIds != null && preTurninIds.Contains(qe.Id))
+                    continue;
+
                 QuestGiverEntry giver = db.QuestGivers
                     .FirstOrDefault(qg => qg.QuestId == qe.Id);
 
@@ -159,6 +181,9 @@ namespace WholesomeAQ
 
             foreach (QuestEntry qe in quests)
             {
+                if (preTurninIds != null && preTurninIds.Contains(qe.Id))
+                    continue;
+
                 foreach (QuestObjective obj in qe.Objectives)
                 {
                     if (obj.Type == ObjectiveType.KillMob && obj.MobId > 0)
@@ -199,6 +224,9 @@ namespace WholesomeAQ
 
             foreach (QuestEntry qe in quests)
             {
+                if (preTurninIds != null && preTurninIds.Contains(qe.Id))
+                    continue;
+
                 QuestEnderEntry ender = db.QuestEnders
                     .FirstOrDefault(qe2 => qe2.QuestId == qe.Id);
 

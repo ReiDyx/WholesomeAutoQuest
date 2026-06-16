@@ -329,13 +329,25 @@ namespace WholesomeAQ
             }
 
             List<QuestEntry> logQuests = GetLogQuestsWithObjectives(me, db);
+            int staleMinLevel = Math.Max(1, me.Level - 7);
+            var logPlayersQuests = new HashSet<int>(
+                me.QuestLog.GetAllQuests()
+                    .Where(q => q.IsCompleted)
+                    .Select(q => (int)q.Id));
 
-            int remaining = _settings.MaxQuestsPerProfile - logQuests.Count;
+            List<QuestEntry> staleTurnins = logQuests
+                .Where(q => q.QuestLevel > 0 && q.QuestLevel < staleMinLevel && logPlayersQuests.Contains(q.Id))
+                .ToList();
+            List<QuestEntry> activeLogQuests = logQuests
+                .Except(staleTurnins)
+                .ToList();
+
+            int remaining = _settings.MaxQuestsPerProfile - activeLogQuests.Count;
             List<QuestEntry> newQuests = new List<QuestEntry>();
             if (remaining > 0)
                 newQuests = FilterAvailableQuests(db, me).Take(remaining).ToList();
 
-            List<QuestEntry> allQuests = logQuests.Concat(newQuests)
+            List<QuestEntry> allQuests = staleTurnins.Concat(activeLogQuests).Concat(newQuests)
                 .Take(_settings.MaxQuestsPerProfile).ToList();
 
             if (allQuests.Count == 0)
@@ -356,7 +368,8 @@ namespace WholesomeAQ
             _scanThreshold = _settings.ScanStartDistance;
             ActiveQuestIds = new HashSet<int>(allQuests.Select(q => q.Id));
 
-            string xml = _profileBuilder.BuildProfileXml(allQuests, db, me.ZoneText, me.Name, me.Level, CurrentVendors);
+            var preIds = new HashSet<int>(staleTurnins.Select(q => q.Id));
+            string xml = _profileBuilder.BuildProfileXml(allQuests, db, me.ZoneText, me.Name, me.Level, CurrentVendors, preIds);
             CurrentProfilePath = _profileBuilder.WriteProfile(xml);
             string ids = string.Join(",", allQuests.Select(q => q.Id));
             LastStatus = $"{allQuests.Count} quests [{ids}]";
