@@ -31,6 +31,7 @@ namespace WholesomeAQ
         private bool _restartAfterStop;
         private string _profilePath;
         private string _vendorBlacklistPath;
+        private string _questBlacklistPath;
         private Timer _restartTimer;
         private double _lastX, _lastY, _lastZ;
         private double _anchorX, _anchorY, _anchorZ;
@@ -58,7 +59,9 @@ namespace WholesomeAQ
             _vendorLoader = new VendorDataLoader();
             _vendorDataReady = _vendorLoader.Load();
             _vendorBlacklistPath = Path.Combine(Path.GetDirectoryName(_profilePath), "vendor_blacklist.txt");
+            _questBlacklistPath = Path.Combine(Path.GetDirectoryName(_profilePath), "quest_blacklist.txt");
             LoadVendorBlacklist();
+            LoadQuestBlacklist();
             _scheduler = new QuestScheduler(_dataLoader, _profileBuilder, _settings);
             _initialized = true;
             _lastScanTime = DateTime.MinValue;
@@ -282,6 +285,7 @@ namespace WholesomeAQ
                                     stuckQuest = _scheduler.ActiveQuestIds.First();
                                 }
                                 _settings.BlacklistedQuests.Add(stuckQuest);
+                                SaveQuestBlacklist();
                                 Log($"Blacklisted quest {stuckQuest} — stuck for {stuckSec:F0}s, forcing re-scan");
                                 TreeRoot.Stop();
                             }
@@ -439,6 +443,36 @@ namespace WholesomeAQ
             catch (Exception ex)
             {
                 Log($"Failed to save vendor blacklist: {ex.Message}");
+            }
+        }
+
+        private void LoadQuestBlacklist()
+        {
+            if (!File.Exists(_questBlacklistPath)) return;
+            try
+            {
+                string text = File.ReadAllText(_questBlacklistPath).Trim();
+                _settings.BlacklistText = text;
+                Log($"Loaded {_settings.BlacklistedQuests.Count} blacklisted quests");
+            }
+            catch (Exception ex)
+            {
+                Log($"Failed to load quest blacklist: {ex.Message}");
+            }
+        }
+
+        private void SaveQuestBlacklist()
+        {
+            try
+            {
+                string dir = Path.GetDirectoryName(_questBlacklistPath);
+                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+                File.WriteAllText(_questBlacklistPath, _settings.BlacklistText);
+            }
+            catch (Exception ex)
+            {
+                Log($"Failed to save quest blacklist: {ex.Message}");
             }
         }
     }

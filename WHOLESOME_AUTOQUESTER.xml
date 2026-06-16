@@ -11,10 +11,10 @@
   <Vendors>
     <Vendor Name="Godric Rothgar" Entry="1213" Type="Repair" X="-8898.23" Y="-119.838" Z="82.016" />
     <Vendor Name="Janos Hammerknuckle" Entry="78" Type="Repair" X="-8909.46" Y="-104.163" Z="82.0314" />
-    <Vendor Name="Smith Argus" Entry="514" Type="Repair" X="-9456.65" Y="87.8553" Z="58.4271" />
-    <Vendor Name="Jason Mathers" Entry="383" Type="Food" X="-9378.89" Y="-111.923" Z="59.006" />
-    <Vendor Name="Lee Brown" Entry="1651" Type="Food" X="-9382.08" Y="-117.005" Z="58.9841" />
+    <Vendor Name="Jordan Smith" Entry="55684" Type="Repair" X="-8557.13" Y="593.646" Z="104.682" />
     <Vendor Name="Jasper Fel" Entry="1325" Type="Food" X="-8807.56" Y="328.195" Z="102.336" />
+    <Vendor Name="Erika Tate" Entry="5483" Type="Food" X="-8608.36" Y="358.496" Z="99.7064" />
+    <Vendor Name="Stephen Ryback" Entry="5482" Type="Food" X="-8610.9" Y="364.64" Z="99.7062" />
     <Vendor Name="Khelden Bremen" Entry="198" Type="Train" X="-8851.57" Y="-188.234" Z="89.4958" TrainClass="Mage" />
     <Vendor Name="Zaldimar Wefhellt" Entry="328" Type="Train" X="-9471.67" Y="34.451" Z="63.9038" TrainClass="Mage" />
   </Vendors>
@@ -23,34 +23,34 @@
       <Hotspots />
     </Objective>
   </Quest>
-  <Quest Id="2158" Name="Rest and Relaxation" />
-  <Quest Id="5261" Name="Eagan Peltskinner" />
-  <Quest Id="15" Name="Investigate Echo Ridge">
-    <Objective Type="KillMob" MobId="257" KillCount="8">
+  <Quest Id="21" Name="Skirmish at Echo Ridge">
+    <Objective Type="KillMob" MobId="80" KillCount="8">
       <Hotspots>
-        <Hotspot X="-8763.31" Y="-159.256" Z="82.9625" />
-        <Hotspot X="-8756.81" Y="-171.434" Z="84.8866" />
-        <Hotspot X="-8769.9" Y="-138.115" Z="82.5352" />
-        <Hotspot X="-8768.63" Y="-113.135" Z="83.7794" />
-        <Hotspot X="-8786.94" Y="-105.911" Z="83.4065" />
-        <Hotspot X="-8770.12" Y="-117.703" Z="83.4954" />
-        <Hotspot X="-8767.71" Y="-111.647" Z="84.3424" />
-        <Hotspot X="-8752.36" Y="-101.854" Z="87.9305" />
-        <Hotspot X="-8721.69" Y="-155.805" Z="85.3738" />
-        <Hotspot X="-8717.47" Y="-144.581" Z="86.4988" />
+        <Hotspot X="-8534" Y="-199" Z="83.7842" />
+        <Hotspot X="-8671.83" Y="-123.34" Z="92.1135" />
+        <Hotspot X="-8632.33" Y="-143.753" Z="86.3842" />
+        <Hotspot X="-8616.27" Y="-143.334" Z="87.4937" />
+        <Hotspot X="-8640.19" Y="-143.559" Z="86.8829" />
+        <Hotspot X="-8640.58" Y="-113.289" Z="87.0824" />
+        <Hotspot X="-8635.27" Y="-110.326" Z="86.9396" />
+        <Hotspot X="-8657.9" Y="-124.669" Z="91.0275" />
+        <Hotspot X="-8639.08" Y="-132.949" Z="87.094" />
+        <Hotspot X="-8654.91" Y="-127.006" Z="89.6647" />
       </Hotspots>
     </Objective>
   </Quest>
+  <Quest Id="2158" Name="Rest and Relaxation" />
+  <Quest Id="5261" Name="Eagan Peltskinner" />
   <QuestOrder>
     <PickUp QuestName="Brotherhood of Thieves" QuestId="18" GiverName="Deputy Willem" GiverId="823" />
+    <PickUp QuestName="Skirmish at Echo Ridge" QuestId="21" GiverName="Marshal McBride" GiverId="197" />
     <PickUp QuestName="Rest and Relaxation" QuestId="2158" GiverName="Falkhaan Isenstrider" GiverId="6774" />
     <PickUp QuestName="Eagan Peltskinner" QuestId="5261" GiverName="Deputy Willem" GiverId="823" />
-    <PickUp QuestName="Investigate Echo Ridge" QuestId="15" GiverName="Marshal McBride" GiverId="197" />
     <Objective QuestName="Brotherhood of Thieves" QuestId="18" Type="CollectItem" ItemId="752" CollectCount="8" MobId="38" />
-    <Objective QuestName="Investigate Echo Ridge" QuestId="15" Type="KillMob" MobId="257" KillCount="8" />
+    <Objective QuestName="Skirmish at Echo Ridge" QuestId="21" Type="KillMob" MobId="80" KillCount="8" />
     <TurnIn QuestName="Brotherhood of Thieves" QuestId="18" TurnInName="Deputy Willem" TurnInId="823" />
+    <TurnIn QuestName="Skirmish at Echo Ridge" QuestId="21" TurnInName="Marshal McBride" TurnInId="197" />
     <TurnIn QuestName="Rest and Relaxation" QuestId="2158" TurnInName="Innkeeper Farley" TurnInId="295" />
     <TurnIn QuestName="Eagan Peltskinner" QuestId="5261" TurnInName="Eagan Peltskinner" TurnInId="196" />
-    <TurnIn QuestName="Investigate Echo Ridge" QuestId="15" TurnInName="Marshal McBride" TurnInId="197" />
   </QuestOrder>
 </HBProfile>
