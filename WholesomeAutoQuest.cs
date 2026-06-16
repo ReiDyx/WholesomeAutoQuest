@@ -1,0 +1,447 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
+using Styx;
+using Styx.Logic.POI;
+using Styx.Helpers;
+using Styx.Logic.AreaManagement;
+using Styx.Logic.BehaviorTree;
+using Styx.Logic.Inventory.Frames.Merchant;
+using Styx.Logic.Pathing;
+using Styx.Logic.Profiles;
+using Bots.Quest.QuestOrder;
+using TreeSharp;
+using Action = TreeSharp.Action;
+
+namespace WholesomeAQ
+{
+    public class WholesomeAutoQuest : Bots.Quest.QuestBot
+    {
+        private DataLoader _dataLoader;
+        private VendorDataLoader _vendorLoader;
+        private QuestScheduler _scheduler;
+        private ProfileBuilder _profileBuilder;
+        private WholesomeAQSettings _settings = new WholesomeAQSettings();
+        private bool _initialized;
+        private bool _dataReady;
+        private bool _vendorDataReady;
+        private DateTime _lastScanTime = DateTime.MinValue;
+        private string _profilePath;
+        private string _vendorBlacklistPath;
+        private Timer _restartTimer;
+        private double _lastX, _lastY, _lastZ;
+        private double _anchorX, _anchorY, _anchorZ;
+        private bool _anchorSet;
+        private DateTime _lastMovedTime = DateTime.Now;
+        private DateTime _lastProgressTime = DateTime.Now;
+        private DateTime _lastBlackspotTime = DateTime.MinValue;
+        private bool _wasStuck;
+        private bool _stuckLogged;
+
+        public override string Name => "Wholesome Auto Quest";
+        public override bool RequiresProfile => false;
+
+        public override Composite Root => base.Root;
+
+        public override Form ConfigurationForm
+        {
+            get { return new SettingsForm(_settings, Log); }
+        }
+
+        public override void Start()
+        {
+            _profilePath = FindProfilePath();
+            _profileBuilder = new ProfileBuilder(_profilePath);
+            _dataLoader = new DataLoader();
+            _dataReady = _dataLoader.Load() != null;
+            _vendorLoader = new VendorDataLoader();
+            _vendorDataReady = _vendorLoader.Load();
+            _vendorBlacklistPath = Path.Combine(Path.GetDirectoryName(_profilePath), "vendor_blacklist.txt");
+            LoadVendorBlacklist();
+            _scheduler = new QuestScheduler(_dataLoader, _profileBuilder, _settings);
+            _initialized = true;
+            _lastScanTime = DateTime.MinValue;
+
+            if (_restartTimer == null)
+            {
+                _restartTimer = new Timer { Interval = 1000 };
+                _restartTimer.Tick += (_, _) =>
+                {
+                    try
+                    {
+                        if (!TreeRoot.IsRunning)
+                        {
+                            if (StyxWoW.Me.Combat)
+                            {
+                                Log("Stopped while in combat — resuming instantly");
+                                TreeRoot.Start();
+                            }
+                            DoScan();
+                        }
+                        else if (_lastScanTime != DateTime.MinValue
+                              && (DateTime.Now - _lastScanTime).TotalSeconds > 30
+                              && !StyxWoW.Me.Combat)
+                        {
+                            _lastScanTime = DateTime.Now;
+                            TreeRoot.Stop();
+                        }
+                    }
+                    catch { }
+                };
+                _restartTimer.Start();
+            }
+
+            base.Start();
+
+            DoScan();
+
+            Log(_dataReady ? "Started with quest data loaded." : "Started. No quest data loaded.");
+        }
+
+        public override void Stop()
+        {
+            base.Stop();
+            Log("Stopped.");
+        }
+
+        private void DoScan()
+        {
+            if (!_initialized || !_dataReady) return;
+            if (!StyxWoW.IsInGame || StyxWoW.Me == null) return;
+
+            _lastScanTime = DateTime.Now;
+
+            try
+            {
+                _scheduler.SyncBlacklist();
+
+                if (_vendorDataReady && StyxWoW.Me != null)
+                {
+                    var bl = _settings.BlacklistedVendors;
+                    _scheduler.CurrentVendors = _vendorLoader.GetNearestVendors(StyxWoW.Me, "Repair", 3, bl)
+                        .Concat(_vendorLoader.GetNearestVendors(StyxWoW.Me, "Food", 3, bl))
+                        .Concat(_vendorLoader.GetNearestVendors(StyxWoW.Me, "Train", 2, bl))
+                        .ToList();
+                }
+
+                if (_scheduler.ScanAndRefresh(StyxWoW.Me))
+                {
+                    bool hasQuests = _scheduler.ActiveQuestIds != null
+                                  && _scheduler.ActiveQuestIds.Count > 0;
+
+                    if (hasQuests)
+                    {
+                        if (StyxWoW.Me.Combat)
+                        {
+                            Log("In combat — deferring profile refresh");
+                            return;
+                        }
+
+                        if (string.IsNullOrEmpty(_scheduler.CurrentProfilePath))
+                        {
+                            Log("Profile path is null — skipping refresh");
+                            return;
+                        }
+
+                        ProfileManager.LoadNew(_scheduler.CurrentProfilePath);
+                        if (TreeRoot.IsRunning)
+                        {
+                            TreeRoot.Stop();
+                            if (StyxWoW.Me.Combat)
+                            {
+                                Log("In combat after stop — resuming instantly");
+                                TreeRoot.Start();
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            TreeRoot.Start();
+                        }
+                        Log($"Profile refreshed - {_scheduler.LastStatus}");
+                        if (_dataLoader.Database != null && _scheduler.ActiveQuestIds.Count > 0)
+                        {
+                            var levels = _dataLoader.Database.Quests
+                                .Where(q => _scheduler.ActiveQuestIds.Contains(q.Id))
+                                .Select(q => $"{q.Id} (Lvl{q.QuestLevel})");
+                            Log("Picking up: " + string.Join(", ", levels));
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"Scan error: {ex.Message}");
+            }
+        }
+
+        public override void Pulse()
+        {
+            base.Pulse();
+
+            if (StyxWoW.IsInGame && StyxWoW.Me != null && !StyxWoW.Me.Combat && TreeRoot.IsRunning)
+            {
+                var loc = StyxWoW.Me.Location;
+
+                if (!_anchorSet)
+                {
+                    _anchorX = loc.X;
+                    _anchorY = loc.Y;
+                    _anchorZ = loc.Z;
+                    _lastProgressTime = DateTime.Now;
+                    _anchorSet = true;
+                }
+
+                double dx = loc.X - _anchorX;
+                double dy = loc.Y - _anchorY;
+                double dz = loc.Z - _anchorZ;
+                if (dx * dx + dy * dy + dz * dz > 25.0)
+                {
+                    _anchorX = loc.X;
+                    _anchorY = loc.Y;
+                    _anchorZ = loc.Z;
+                    _lastProgressTime = DateTime.Now;
+                }
+
+                if (Math.Abs(loc.X - _lastX) > 0.1 || Math.Abs(loc.Y - _lastY) > 0.1 || Math.Abs(loc.Z - _lastZ) > 0.1)
+                {
+                    _lastX = loc.X;
+                    _lastY = loc.Y;
+                    _lastZ = loc.Z;
+                    _lastMovedTime = DateTime.Now;
+                    _wasStuck = false;
+                    _stuckLogged = false;
+                }
+                else
+                {
+                    double stuckSec = (DateTime.Now - _lastMovedTime).TotalSeconds;
+                    double progressSec = (DateTime.Now - _lastProgressTime).TotalSeconds;
+
+                    if (StuckDetector.IsStuck && progressSec >= 10 && (DateTime.Now - _lastBlackspotTime).TotalSeconds > 10)
+                    {
+                        _lastBlackspotTime = DateTime.Now;
+                        BlackspotManager.AddBlackspot(loc, 10f, 5f);
+                        BlackspotManager.EnsureBlackspotsMarked();
+                        Navigator.Clear();
+                        Log($"No progress for 10s — added 10yd blackspot at ({loc.X:F1}, {loc.Y:F1}, {loc.Z:F1})");
+                    }
+
+                    if (stuckSec > 30 && !_wasStuck)
+                    {
+                        var poi = BotPoi.Current;
+                        bool poiIsVendor = poi != null
+                            && (poi.Type == PoiType.Sell
+                             || poi.Type == PoiType.Repair
+                             || poi.Type == PoiType.Buy
+                             || poi.Type == PoiType.Train);
+
+                        if (poiIsVendor)
+                        {
+                            _wasStuck = true;
+                            _stuckLogged = true;
+                            _settings.BlacklistedVendors.Add((int)poi.Entry);
+                            SaveVendorBlacklist();
+                            Log($"Blacklisted vendor {poi.Name} (Entry:{poi.Entry}) — stuck for {stuckSec:F0}s, forcing re-scan");
+                            TreeRoot.Stop();
+                        }
+                        else if (MerchantFrame.Instance.IsVisible
+                            && _scheduler?.CurrentVendors != null
+                            && _scheduler.CurrentVendors.Any(v =>
+                                Math.Sqrt(Math.Pow(v.X - loc.X, 2) + Math.Pow(v.Y - loc.Y, 2)) < 50))
+                        {
+                            _wasStuck = true;
+                            _stuckLogged = true;
+                            var stuckVendor = _scheduler.CurrentVendors
+                                .Where(v => Math.Sqrt(Math.Pow(v.X - loc.X, 2) + Math.Pow(v.Y - loc.Y, 2)) < 50)
+                                .OrderBy(v => Math.Sqrt(Math.Pow(v.X - loc.X, 2) + Math.Pow(v.Y - loc.Y, 2)))
+                                .First();
+                            _settings.BlacklistedVendors.Add(stuckVendor.Entry);
+                            SaveVendorBlacklist();
+                            Log($"Blacklisted vendor {stuckVendor.Name} (Entry:{stuckVendor.Entry}) — stuck for {stuckSec:F0}s (fallback), forcing re-scan");
+                            TreeRoot.Stop();
+                        }
+                        else if (stuckSec > 180)
+                        {
+                            _wasStuck = true;
+                            _stuckLogged = true;
+                            if (_scheduler?.ActiveQuestIds != null && _scheduler.ActiveQuestIds.Count > 0)
+                            {
+                                int stuckQuest = FindStuckQuestByNoHotspots();
+                                if (stuckQuest == 0)
+                                    stuckQuest = FindStuckQuestByPoi();
+                                if (stuckQuest == 0)
+                                {
+                                    var qpoi = BotPoi.Current;
+                                    if (qpoi == null || qpoi.Type == PoiType.None)
+                                    {
+                                        Log($"No POI set — can't determine stuck quest ({stuckSec:F0}s). No quest blacklisted.");
+                                        _wasStuck = true;
+                                        _stuckLogged = true;
+                                        return;
+                                    }
+                                    stuckQuest = _scheduler.ActiveQuestIds.First();
+                                }
+                                _settings.BlacklistedQuests.Add(stuckQuest);
+                                Log($"Blacklisted quest {stuckQuest} — stuck for {stuckSec:F0}s, forcing re-scan");
+                                TreeRoot.Stop();
+                            }
+                        }
+                        else if (!_stuckLogged)
+                        {
+                            _stuckLogged = true;
+                            Log($"Bot running but not moving for {stuckSec:F0}s");
+                        }
+                    }
+                }
+            }
+
+            if (_settings.SellWhite || _settings.SellGreen || _settings.SellBlue)
+                SellByQuality();
+        }
+
+        private bool _lastFrameVisible;
+
+        private void SellByQuality()
+        {
+            if (!MerchantFrame.Instance.IsVisible)
+            {
+                _lastFrameVisible = false;
+                return;
+            }
+
+            if (!_lastFrameVisible)
+            {
+                _lastFrameVisible = true;
+                Log("Arrived at vendor — merchant frame opened");
+            }
+
+            ItemQuality mask = ItemQuality.None;
+            if (_settings.SellWhite) mask |= ItemQuality.Common;
+            if (_settings.SellGreen) mask |= ItemQuality.Uncommon;
+            if (_settings.SellBlue) mask |= ItemQuality.Rare;
+
+            if (mask == ItemQuality.None) return;
+
+            var protectedIds = new HashSet<uint>();
+
+            if (_dataLoader.Database != null && _scheduler?.ActiveQuestIds != null)
+            {
+                foreach (int qId in _scheduler.ActiveQuestIds)
+                {
+                    var quest = _dataLoader.Database.Quests.FirstOrDefault(q => q.Id == qId);
+                    if (quest == null) continue;
+                    if (quest.StartItem > 0)
+                        protectedIds.Add((uint)quest.StartItem);
+                    foreach (var obj in quest.Objectives)
+                    {
+                        if (obj.ItemId > 0)
+                            protectedIds.Add((uint)obj.ItemId);
+                    }
+                }
+            }
+
+            MerchantFrame.Instance.SellItemQualities(mask, null, protectedIds);
+        }
+
+        private static string FindProfilePath()
+        {
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string path = Path.Combine(baseDir, "Bots", "WholesomeAutoQuest", "WHOLESOME_AUTOQUESTER.xml");
+            string dir = Path.GetDirectoryName(path);
+            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+            return path;
+        }
+
+        internal void Log(string message)
+        {
+            Logging.Write(System.Drawing.Color.CornflowerBlue, $"[{Name}] {message}");
+        }
+
+        private int FindStuckQuestByNoHotspots()
+        {
+            if (_scheduler?.ActiveQuestIds == null || _scheduler.ActiveQuestIds.Count == 0)
+                return 0;
+
+            var currentBehavior = QuestOrder.Instance?.CurrentBehavior as ForcedQuestObjective;
+            if (currentBehavior?.Objective?.QuestArea == null)
+                return 0;
+
+            var qa = currentBehavior.Objective.QuestArea;
+            if (qa.HotspotsCreated)
+                return 0;
+
+            int qId = (int)qa.Quest.Id;
+            if (_scheduler.ActiveQuestIds.Contains(qId))
+            {
+                Log($"No hotspots created for quest {qId} ({qa.Quest.Name}) — will blacklist");
+                return qId;
+            }
+
+            return 0;
+        }
+
+        private int FindStuckQuestByPoi()
+        {
+            var poi = BotPoi.Current;
+            if (poi == null) return 0;
+            if (poi.Type != PoiType.Quest && poi.Type != PoiType.QuestPickUp && poi.Type != PoiType.QuestTurnIn
+                && poi.Type != PoiType.Kill && poi.Type != PoiType.Loot)
+                return 0;
+            if (_dataLoader?.Database == null || _scheduler?.ActiveQuestIds == null)
+                return 0;
+
+            int entry = (int)poi.Entry;
+            if (entry <= 0) return 0;
+
+            foreach (int qId in _scheduler.ActiveQuestIds)
+            {
+                var quest = _dataLoader.Database.Quests.FirstOrDefault(q => q.Id == qId);
+                if (quest == null) continue;
+
+                if (quest.Objectives.Any(o => o.MobId == entry || o.GameObjectId == entry))
+                    return qId;
+
+                if (_dataLoader.Database.QuestGivers.Any(g => g.QuestId == qId && g.GiverId == entry))
+                    return qId;
+
+                if (_dataLoader.Database.QuestEnders.Any(e => e.QuestId == qId && e.EnderId == entry))
+                    return qId;
+            }
+
+            return 0;
+        }
+
+        private void LoadVendorBlacklist()
+        {
+            if (!File.Exists(_vendorBlacklistPath)) return;
+            try
+            {
+                string text = File.ReadAllText(_vendorBlacklistPath).Trim();
+                _settings.VendorBlacklistText = text;
+                Log($"Loaded {_settings.BlacklistedVendors.Count} blacklisted vendors");
+            }
+            catch (Exception ex)
+            {
+                Log($"Failed to load vendor blacklist: {ex.Message}");
+            }
+        }
+
+        private void SaveVendorBlacklist()
+        {
+            try
+            {
+                string dir = Path.GetDirectoryName(_vendorBlacklistPath);
+                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+                File.WriteAllText(_vendorBlacklistPath, _settings.VendorBlacklistText);
+            }
+            catch (Exception ex)
+            {
+                Log($"Failed to save vendor blacklist: {ex.Message}");
+            }
+        }
+    }
+}
