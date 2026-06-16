@@ -242,6 +242,24 @@ namespace WholesomeAQ
                             Log($"Blacklisted vendor {stuckVendor.Name} (Entry:{stuckVendor.Entry}) — stuck for {stuckSec:F0}s (fallback), forcing re-scan");
                             TreeRoot.Stop();
                         }
+                        else if (TrainerFrame.Instance.IsVisible
+                            && _scheduler?.CurrentVendors != null
+                            && _scheduler.CurrentVendors.Any(v =>
+                                !string.IsNullOrEmpty(v.TrainClass)
+                                && Math.Sqrt(Math.Pow(v.X - loc.X, 2) + Math.Pow(v.Y - loc.Y, 2)) < 50))
+                        {
+                            _wasStuck = true;
+                            _stuckLogged = true;
+                            var stuckVendor = _scheduler.CurrentVendors
+                                .Where(v => !string.IsNullOrEmpty(v.TrainClass)
+                                    && Math.Sqrt(Math.Pow(v.X - loc.X, 2) + Math.Pow(v.Y - loc.Y, 2)) < 50)
+                                .OrderBy(v => Math.Sqrt(Math.Pow(v.X - loc.X, 2) + Math.Pow(v.Y - loc.Y, 2)))
+                                .First();
+                            _settings.BlacklistedVendors.Add(stuckVendor.Entry);
+                            SaveVendorBlacklist();
+                            Log($"Blacklisted trainer {stuckVendor.Name} (Entry:{stuckVendor.Entry}) — stuck for {stuckSec:F0}s (trainer frame open), forcing re-scan");
+                            TreeRoot.Stop();
+                        }
                         else if (stuckSec > 180)
                         {
                             _wasStuck = true;
