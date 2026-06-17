@@ -25,13 +25,15 @@ namespace WholesomeAQ
 
         private readonly Action _forceStop;
         private readonly Action _resume;
+        private readonly Action _saveQuestBlacklist;
 
-        public SettingsForm(WholesomeAQSettings settings, Action<string> log, Action forceStop = null, Action resume = null)
+        public SettingsForm(WholesomeAQSettings settings, Action<string> log, Action forceStop = null, Action resume = null, Action saveQuestBlacklist = null)
         {
             _settings = settings;
             _log = log;
             _forceStop = forceStop;
             _resume = resume;
+            _saveQuestBlacklist = saveQuestBlacklist;
             Text = "Wholesome Auto Quest Settings";
             Size = new Size(350, 520);
             FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -209,6 +211,7 @@ namespace WholesomeAQ
             _settings.SellGreen = _chkSellGreen.Checked;
             _settings.SellBlue = _chkSellBlue.Checked;
             _settings.BlacklistText = _txtBlacklist.Text;
+            _saveQuestBlacklist?.Invoke();
         }
 
         private void BtnAbandon_Click(object sender, EventArgs e)

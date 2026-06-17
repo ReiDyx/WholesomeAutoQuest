@@ -58,7 +58,8 @@ namespace WholesomeAQ
             {
                 return new SettingsForm(_settings, Log,
                     forceStop: () => { _forceStopped = true; TreeRoot.Stop(); },
-                    resume: () => { _forceStopped = false; DoScan(); });
+                    resume: () => { _forceStopped = false; DoScan(); },
+                    saveQuestBlacklist: SaveQuestBlacklist);
             }
         }
 
