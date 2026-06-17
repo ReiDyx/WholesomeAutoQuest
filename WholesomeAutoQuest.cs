@@ -344,10 +344,10 @@ namespace WholesomeAQ
                             Log($"Blacklisted quest {qId} ({pickup.QuestName}) from {poi.Name} (Entry:{poi.Entry}) — failed to pick up for 60s, triggering rescan");
                             TreeRoot.Stop();
                         }
-                        else if (IsNearGiver(poi.Entry))
+                        else if (IsNearGiver((int)poi.Entry))
                         {
                             int[] ids = _dataLoader?.Database?.QuestGivers
-                                ?.Where(g => g.GiverId == poi.Entry)
+                                ?.Where(g => g.GiverId == (int)poi.Entry)
                                 .Select(g => g.QuestId).ToArray();
                             if (ids != null && ids.Length > 0)
                             {
