@@ -12,6 +12,7 @@ using Styx.Logic.Inventory.Frames.Merchant;
 using Styx.Logic.Inventory.Frames.Trainer;
 using Styx.Logic.Pathing;
 using Styx.Logic.Profiles;
+using Styx.WoWInternals;
 using Bots.Quest.QuestOrder;
 using TreeSharp;
 using Action = TreeSharp.Action;
@@ -40,6 +41,9 @@ namespace WholesomeAQ
         private DateTime _lastMovedTime = DateTime.Now;
         private HashSet<int> _lastReadyQuestIds;
         private bool _pendingRescan;
+        private DateTime _pickupStartTime;
+        private string _lastPickupTarget;
+        private bool _pickupLogged;
         private bool _wasStuck;
         private bool _stuckLogged;
 
@@ -62,7 +66,10 @@ namespace WholesomeAQ
             _vendorLoader = new VendorDataLoader();
             _vendorDataReady = _vendorLoader.Load();
             _vendorBlacklistPath = Path.Combine(Path.GetDirectoryName(_profilePath), "vendor_blacklist.txt");
-            _questBlacklistPath = Path.Combine(Path.GetDirectoryName(_profilePath), "quest_blacklist.txt");
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string charName = StyxWoW.Me?.Name ?? "Unknown";
+            string realm = Lua.GetReturnVal<string>("return GetRealmName()", 0) ?? "Unknown";
+            _questBlacklistPath = Path.Combine(baseDir, "Settings", "WholesomeAutoQuest", $"{charName}-{realm}", "quest_blacklist.txt");
             LoadVendorBlacklist();
             LoadQuestBlacklist();
             _scheduler = new QuestScheduler(_dataLoader, _profileBuilder, _settings);
@@ -316,6 +323,57 @@ namespace WholesomeAQ
 
             if (StyxWoW.IsInGame && StyxWoW.Me != null && TreeRoot.IsRunning)
             {
+                var poi = BotPoi.Current;
+                if (poi != null && poi.Type == PoiType.QuestPickUp)
+                {
+                    string target = $"{poi.Name}|{poi.Entry}";
+                    if (target != _lastPickupTarget)
+                    {
+                        _lastPickupTarget = target;
+                        _pickupStartTime = DateTime.Now;
+                        _pickupLogged = false;
+                    }
+                    else if (!_pickupLogged
+                          && _pickupStartTime != DateTime.MinValue
+                          && (DateTime.Now - _pickupStartTime).TotalSeconds >= 20)
+                    {
+                        var pickup = QuestOrder.Instance?.CurrentBehavior as ForcedQuestPickUp;
+                        if (pickup != null)
+                        {
+                            int qId = (int)pickup.QuestId;
+                            _settings.BlacklistedQuests.Add(qId);
+                            SaveQuestBlacklist();
+                            Log($"Blacklisted quest {qId} ({pickup.QuestName}) from {poi.Name} (Entry:{poi.Entry}) — failed to pick up for 20s, triggering rescan");
+                        }
+                        else
+                        {
+                            int[] ids = _dataLoader?.Database?.QuestGivers
+                                ?.Where(g => g.GiverId == poi.Entry)
+                                .Select(g => g.QuestId).ToArray();
+                            if (ids != null && ids.Length > 0)
+                            {
+                                foreach (int id in ids)
+                                    _settings.BlacklistedQuests.Add(id);
+                                SaveQuestBlacklist();
+                                string idsStr = string.Join(",", ids);
+                                Log($"Blacklisted quest(s) [{idsStr}] from {poi.Name} (Entry:{poi.Entry}) — failed to pick up for 20s, triggering rescan");
+                            }
+                            else
+                            {
+                                Log($"Stuck at {poi.Name} (Entry:{poi.Entry}) for 20s — can't resolve quest ID, no blacklist added");
+                            }
+                        }
+                        _pendingRescan = true;
+                        _pickupLogged = true;
+                    }
+                }
+                else
+                {
+                    _lastPickupTarget = null;
+                    _pickupStartTime = DateTime.MinValue;
+                    _pickupLogged = false;
+                }
+
                 var currentReady = new HashSet<int>(
                     StyxWoW.Me.QuestLog.GetAllQuests()
                         .Where(q => q.IsCompleted)

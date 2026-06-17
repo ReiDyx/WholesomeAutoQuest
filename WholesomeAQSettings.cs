@@ -9,6 +9,7 @@ namespace WholesomeAQ
         public int ScanStep { get; set; } = 250;
         public int ScanMaxDistance { get; set; } = 4000;
         public int MaxQuestsPerProfile { get; set; } = 20;
+        public int MinQuestLevelOffset { get; set; } = 7;
         public bool EnableAutoVendor { get; set; } = true;
         public bool EnableAutoTrain { get; set; } = true;
         public bool SellWhite { get; set; } = false;

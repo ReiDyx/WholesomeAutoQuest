@@ -15,6 +15,7 @@ namespace WholesomeAQ
         private NumericUpDown _numStep;
         private NumericUpDown _numMaxDist;
         private NumericUpDown _numMaxQuests;
+        private NumericUpDown _numMinLevelOffset;
         private CheckBox _chkAutoVendor;
         private CheckBox _chkAutoTrain;
         private CheckBox _chkSellWhite;
@@ -69,6 +70,9 @@ namespace WholesomeAQ
 
             _numMaxQuests = new NumericUpDown { Minimum = 1, Maximum = 50 };
             AddRow("Max quests per profile:", _numMaxQuests);
+
+            _numMinLevelOffset = new NumericUpDown { Minimum = 0, Maximum = 20 };
+            AddRow("Min quest level offset:", _numMinLevelOffset);
 
             _chkAutoVendor = new CheckBox { Text = "Auto-vendor (repair + sell)", Checked = true };
             _chkAutoVendor.Location = new Point(12, y);
@@ -157,6 +161,7 @@ namespace WholesomeAQ
             _numStep.Value = _settings.ScanStep;
             _numMaxDist.Value = _settings.ScanMaxDistance;
             _numMaxQuests.Value = _settings.MaxQuestsPerProfile;
+            _numMinLevelOffset.Value = _settings.MinQuestLevelOffset;
             _chkAutoVendor.Checked = _settings.EnableAutoVendor;
             _chkAutoTrain.Checked = _settings.EnableAutoTrain;
             _chkSellWhite.Checked = _settings.SellWhite;
@@ -171,6 +176,7 @@ namespace WholesomeAQ
             _settings.ScanStep = (int)_numStep.Value;
             _settings.ScanMaxDistance = (int)_numMaxDist.Value;
             _settings.MaxQuestsPerProfile = (int)_numMaxQuests.Value;
+            _settings.MinQuestLevelOffset = (int)_numMinLevelOffset.Value;
             _settings.EnableAutoVendor = _chkAutoVendor.Checked;
             _settings.EnableAutoTrain = _chkAutoTrain.Checked;
             _settings.SellWhite = _chkSellWhite.Checked;

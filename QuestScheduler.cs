@@ -154,7 +154,7 @@ namespace WholesomeAQ
                 if (me.Level < qe.MinLevel)
                     continue;
 
-                int qMin = Math.Max(1, me.Level - 7);
+                int qMin = Math.Max(1, me.Level - _settings.MinQuestLevelOffset);
                 int qMax = me.Level;
                 if (qe.QuestLevel > 0 && (qe.QuestLevel < qMin || qe.QuestLevel > qMax))
                     continue;
