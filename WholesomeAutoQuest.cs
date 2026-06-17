@@ -103,6 +103,7 @@ namespace WholesomeAQ
                                 TreeRoot.Start();
                             }
                             DoScan();
+                            _restartAfterStop = false;
                         }
                         else if (_lastScanTime != DateTime.MinValue
                               && (DateTime.Now - _lastScanTime).TotalSeconds > 30
@@ -363,7 +364,8 @@ namespace WholesomeAQ
                                 Log($"Stuck at {poi.Name} (Entry:{poi.Entry}) for 20s — can't resolve quest ID, no blacklist added");
                             }
                         }
-                        _pendingRescan = true;
+                        _restartAfterStop = true;
+                        TreeRoot.Stop();
                         _pickupLogged = true;
                     }
                 }
