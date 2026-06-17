@@ -333,7 +333,7 @@ namespace WholesomeAQ
                     }
                     else if (!_pickupLogged
                           && _pickupStartTime != DateTime.MinValue
-                          && (DateTime.Now - _pickupStartTime).TotalSeconds >= 20)
+                          && (DateTime.Now - _pickupStartTime).TotalSeconds >= 60)
                     {
                         var pickup = QuestOrder.Instance?.CurrentBehavior as ForcedQuestPickUp;
                         if (pickup != null)
@@ -341,9 +341,10 @@ namespace WholesomeAQ
                             int qId = (int)pickup.QuestId;
                             _settings.BlacklistedQuests.Add(qId);
                             SaveQuestBlacklist();
-                            Log($"Blacklisted quest {qId} ({pickup.QuestName}) from {poi.Name} (Entry:{poi.Entry}) — failed to pick up for 20s, triggering rescan");
+                            Log($"Blacklisted quest {qId} ({pickup.QuestName}) from {poi.Name} (Entry:{poi.Entry}) — failed to pick up for 60s, triggering rescan");
+                            TreeRoot.Stop();
                         }
-                        else
+                        else if (IsNearGiver(poi.Entry))
                         {
                             int[] ids = _dataLoader?.Database?.QuestGivers
                                 ?.Where(g => g.GiverId == poi.Entry)
@@ -354,14 +355,18 @@ namespace WholesomeAQ
                                     _settings.BlacklistedQuests.Add(id);
                                 SaveQuestBlacklist();
                                 string idsStr = string.Join(",", ids);
-                                Log($"Blacklisted quest(s) [{idsStr}] from {poi.Name} (Entry:{poi.Entry}) — failed to pick up for 20s, triggering rescan");
+                                Log($"Blacklisted quest(s) [{idsStr}] from {poi.Name} (Entry:{poi.Entry}) — failed to pick up for 60s, triggering rescan");
+                                TreeRoot.Stop();
                             }
                             else
                             {
-                                Log($"Stuck at {poi.Name} (Entry:{poi.Entry}) for 20s — can't resolve quest ID, no blacklist added");
+                                Log($"Stuck at {poi.Name} (Entry:{poi.Entry}) for 60s — can't resolve quest ID, no blacklist added");
                             }
                         }
-                        TreeRoot.Stop();
+                        else
+                        {
+                            Log($"Stuck at {poi.Name} (Entry:{poi.Entry}) for 60s — not near giver spawn, skipping blacklist");
+                        }
                         _pickupLogged = true;
                     }
                 }
@@ -507,6 +512,44 @@ namespace WholesomeAQ
             }
 
             return 0;
+        }
+
+        private bool IsNearGiver(int giverEntry)
+        {
+            if (_dataLoader?.Database == null || StyxWoW.Me == null)
+                return false;
+
+            string key = giverEntry.ToString();
+            int playerMap = (int)StyxWoW.Me.MapId;
+            var loc = StyxWoW.Me.Location;
+
+            if (_dataLoader.Database.CreatureSpawns.TryGetValue(key, out var creatureSpawns))
+            {
+                foreach (var sp in creatureSpawns)
+                {
+                    if (sp.Map != playerMap) continue;
+                    double dx = sp.X - loc.X;
+                    double dy = sp.Y - loc.Y;
+                    double dz = sp.Z - loc.Z;
+                    if (dx * dx + dy * dy + dz * dz < 225.0)
+                        return true;
+                }
+            }
+
+            if (_dataLoader.Database.GameObjectSpawns.TryGetValue(key, out var goSpawns))
+            {
+                foreach (var sp in goSpawns)
+                {
+                    if (sp.Map != playerMap) continue;
+                    double dx = sp.X - loc.X;
+                    double dy = sp.Y - loc.Y;
+                    double dz = sp.Z - loc.Z;
+                    if (dx * dx + dy * dy + dz * dz < 225.0)
+                        return true;
+                }
+            }
+
+            return false;
         }
 
         private void LoadVendorBlacklist()
