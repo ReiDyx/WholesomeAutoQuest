@@ -23,12 +23,17 @@ namespace WholesomeAQ
         private CheckBox _chkSellBlue;
         private TextBox _txtBlacklist;
 
-        public SettingsForm(WholesomeAQSettings settings, Action<string> log)
+        private readonly Action _forceStop;
+        private readonly Action _resume;
+
+        public SettingsForm(WholesomeAQSettings settings, Action<string> log, Action forceStop = null, Action resume = null)
         {
             _settings = settings;
             _log = log;
+            _forceStop = forceStop;
+            _resume = resume;
             Text = "Wholesome Auto Quest Settings";
-            Size = new Size(350, 440);
+            Size = new Size(350, 520);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
@@ -135,6 +140,27 @@ namespace WholesomeAQ
             btnAbandon.Click += BtnAbandon_Click;
             Controls.Add(btnAbandon);
             y += 40;
+
+            Button btnForceStop = new Button
+            {
+                Text = "Force Stop",
+                Location = new Point(12, y),
+                Size = new Size(140, 26),
+                BackColor = Color.IndianRed
+            };
+            btnForceStop.Click += (_, _) => { _forceStop?.Invoke(); };
+            Controls.Add(btnForceStop);
+
+            Button btnResume = new Button
+            {
+                Text = "Resume",
+                Location = new Point(160, y),
+                Size = new Size(140, 26),
+                BackColor = Color.LightGreen
+            };
+            btnResume.Click += (_, _) => { _resume?.Invoke(); };
+            Controls.Add(btnResume);
+            y += 36;
 
             Button btnSave = new Button
             {

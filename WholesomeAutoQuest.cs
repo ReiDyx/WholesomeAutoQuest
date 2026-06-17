@@ -30,7 +30,7 @@ namespace WholesomeAQ
         private bool _dataReady;
         private bool _vendorDataReady;
         private DateTime _lastScanTime = DateTime.MinValue;
-        private bool _restartAfterStop;
+        private bool _forceStopped;
         private string _profilePath;
         private string _vendorBlacklistPath;
         private string _questBlacklistPath;
@@ -54,7 +54,12 @@ namespace WholesomeAQ
 
         public override Form ConfigurationForm
         {
-            get { return new SettingsForm(_settings, Log); }
+            get
+            {
+                return new SettingsForm(_settings, Log,
+                    forceStop: () => { _forceStopped = true; TreeRoot.Stop(); },
+                    resume: () => { _forceStopped = false; DoScan(); });
+            }
         }
 
         public override void Start()
@@ -87,34 +92,32 @@ namespace WholesomeAQ
                         {
                             _pendingRescan = false;
                             _lastScanTime = DateTime.Now;
-                            _restartAfterStop = true;
                             TreeRoot.Stop();
                             DoScan();
                             TreeRoot.Start();
-                            _restartAfterStop = false;
                             return;
                         }
 
                         if (!TreeRoot.IsRunning)
                         {
+                            if (_forceStopped) return;
                             if (StyxWoW.Me.Combat)
                             {
                                 Log("Stopped while in combat — resuming instantly");
                                 TreeRoot.Start();
                             }
+                            TreeRoot.Stop();
                             DoScan();
-                            _restartAfterStop = false;
+                            TreeRoot.Start();
                         }
                         else if (_lastScanTime != DateTime.MinValue
                               && (DateTime.Now - _lastScanTime).TotalSeconds > 30
                               && !StyxWoW.Me.Combat)
                         {
                             _lastScanTime = DateTime.Now;
-                            _restartAfterStop = true;
                             TreeRoot.Stop();
                             DoScan();
                             TreeRoot.Start();
-                            _restartAfterStop = false;
                         }
                     }
                     catch { }
@@ -124,17 +127,14 @@ namespace WholesomeAQ
 
             base.Start();
 
-            _restartAfterStop = true;
             DoScan();
-            _restartAfterStop = false;
 
             Log(_dataReady ? "Started with quest data loaded." : "Started. No quest data loaded.");
         }
 
         public override void Stop()
         {
-            base.Stop();
-            Log("Stopped.");
+            Log("Use Settings > Force Stop to stop the bot.");
         }
 
         private void DoScan()
@@ -181,10 +181,7 @@ namespace WholesomeAQ
                                 return;
                             }
                         }
-                        else if (_restartAfterStop)
-                        {
-                            TreeRoot.Start();
-                        }
+                        TreeRoot.Start();
                         Log($"Profile refreshed - {_scheduler.LastStatus}");
                     }
                 }
@@ -364,7 +361,6 @@ namespace WholesomeAQ
                                 Log($"Stuck at {poi.Name} (Entry:{poi.Entry}) for 20s — can't resolve quest ID, no blacklist added");
                             }
                         }
-                        _restartAfterStop = true;
                         TreeRoot.Stop();
                         _pickupLogged = true;
                     }
