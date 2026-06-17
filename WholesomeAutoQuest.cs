@@ -38,6 +38,8 @@ namespace WholesomeAQ
         private double _anchorX, _anchorY, _anchorZ;
         private bool _anchorSet;
         private DateTime _lastMovedTime = DateTime.Now;
+        private HashSet<int> _lastReadyQuestIds;
+        private bool _pendingRescan;
         private bool _wasStuck;
         private bool _stuckLogged;
 
@@ -74,6 +76,18 @@ namespace WholesomeAQ
                 {
                     try
                     {
+                        if (_pendingRescan)
+                        {
+                            _pendingRescan = false;
+                            _lastScanTime = DateTime.Now;
+                            _restartAfterStop = true;
+                            TreeRoot.Stop();
+                            DoScan();
+                            TreeRoot.Start();
+                            _restartAfterStop = false;
+                            return;
+                        }
+
                         if (!TreeRoot.IsRunning)
                         {
                             if (StyxWoW.Me.Combat)
@@ -298,6 +312,28 @@ namespace WholesomeAQ
                         }
                     }
                 }
+            }
+
+            if (StyxWoW.IsInGame && StyxWoW.Me != null && TreeRoot.IsRunning)
+            {
+                var currentReady = new HashSet<int>(
+                    StyxWoW.Me.QuestLog.GetAllQuests()
+                        .Where(q => q.IsCompleted)
+                        .Select(q => (int)q.Id));
+
+                if (_lastReadyQuestIds != null && _lastReadyQuestIds.Count > 0)
+                {
+                    var turnedIn = _lastReadyQuestIds.Where(id => !currentReady.Contains(id)).ToList();
+                    if (turnedIn.Count > 0)
+                    {
+                        Log($"Turned in {turnedIn.Count} quest(s): {string.Join(",", turnedIn)} — triggering rescan");
+                        _pendingRescan = true;
+                        _lastReadyQuestIds = null;
+                        return;
+                    }
+                }
+
+                _lastReadyQuestIds = currentReady;
             }
 
             if (_settings.SellWhite || _settings.SellGreen || _settings.SellBlue)

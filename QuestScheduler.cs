@@ -329,7 +329,7 @@ namespace WholesomeAQ
             }
 
             List<QuestEntry> logQuests = GetLogQuestsWithObjectives(me, db);
-            int staleMinLevel = Math.Max(1, me.Level - 7);
+            int staleMinLevel = Math.Max(1, me.Level - 3);
             var logPlayersQuests = new HashSet<int>(
                 me.QuestLog.GetAllQuests()
                     .Where(q => q.IsCompleted)

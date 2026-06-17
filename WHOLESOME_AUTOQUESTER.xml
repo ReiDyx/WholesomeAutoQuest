@@ -9,57 +9,90 @@
   <Blackspots />
   <Mailboxes />
   <Vendors>
-    <Vendor Name="Godric Rothgar" Entry="1213" Type="Repair" X="-8898.23" Y="-119.838" Z="82.016" />
-    <Vendor Name="Janos Hammerknuckle" Entry="78" Type="Repair" X="-8909.46" Y="-104.163" Z="82.0314" />
-    <Vendor Name="Smith Argus" Entry="514" Type="Repair" X="-9456.65" Y="87.8553" Z="58.4271" />
-    <Vendor Name="Jasper Fel" Entry="1325" Type="Food" X="-8807.56" Y="328.195" Z="102.336" />
-    <Vendor Name="Jason Mathers" Entry="383" Type="Food" X="-9378.89" Y="-111.923" Z="59.006" />
-    <Vendor Name="Lee Brown" Entry="1651" Type="Food" X="-9382.08" Y="-117.005" Z="58.9841" />
-    <Vendor Name="Khelden Bremen" Entry="198" Type="Train" X="-8851.57" Y="-188.234" Z="89.4958" TrainClass="Mage" />
+    <Vendor Name="Frank Carlson" Entry="44022" Type="Repair" X="-10585.9" Y="-1160.07" Z="30.1422" />
+    <Vendor Name="Clarise Gnarltree" Entry="3136" Type="Repair" X="-10590.5" Y="-1164.79" Z="30.1331" />
+    <Vendor Name="Morg Gnarltree" Entry="226" Type="Repair" X="-10596.6" Y="-1163.85" Z="30.0597" />
+    <Vendor Name="Antonio Perelli" Entry="844" Type="Food" X="-9628.33" Y="-1176.14" Z="39.9827" />
+    <Vendor Name="Barkeep Hann" Entry="274" Type="Food" X="-10509.3" Y="-1155.51" Z="28.0995" />
+    <Vendor Name="Innkeeper Trelayne" Entry="6790" Type="Food" X="-10516" Y="-1161.21" Z="28.1161" />
+    <Vendor Name="Theocritus" Entry="313" Type="Train" X="-9553.08" Y="-728.152" Z="99.2522" TrainClass="Mage" />
     <Vendor Name="Zaldimar Wefhellt" Entry="328" Type="Train" X="-9471.67" Y="34.451" Z="63.9038" TrainClass="Mage" />
   </Vendors>
   <Quest Id="36" Name="Westfall Stew" />
-  <Quest Id="47" Name="Gold Dust Exchange">
-    <Objective Type="CollectItem" ItemId="773" CollectCount="10">
+  <Quest Id="52" Name="Protect the Frontier">
+    <Objective Type="KillMob" MobId="118" KillCount="8">
+      <Hotspots>
+        <Hotspot X="-9711.21" Y="-1084.78" Z="40.7394" />
+        <Hotspot X="-9656.53" Y="-1083.56" Z="43.39" />
+        <Hotspot X="-9413.37" Y="-1124.11" Z="59.1057" />
+        <Hotspot X="-9461.59" Y="-973.419" Z="56.3415" />
+        <Hotspot X="-9447.56" Y="-977.222" Z="55.8026" />
+        <Hotspot X="-9450.68" Y="-957.841" Z="55.7379" />
+        <Hotspot X="-9439.83" Y="-972.599" Z="55.7748" />
+        <Hotspot X="-8985.36" Y="-777.824" Z="72.2418" />
+        <Hotspot X="-8941.04" Y="-734.319" Z="70.4347" />
+        <Hotspot X="-8885.08" Y="-890.691" Z="74.929" />
+      </Hotspots>
+    </Objective>
+    <Objective Type="KillMob" MobId="822" KillCount="5">
+      <Hotspots>
+        <Hotspot X="-9780.58" Y="-553.3" Z="33.6325" />
+        <Hotspot X="-9772.18" Y="-658.219" Z="38.8135" />
+        <Hotspot X="-9693.27" Y="756.903" Z="31.5184" />
+        <Hotspot X="-9869.39" Y="684.55" Z="36.0992" />
+        <Hotspot X="-10038.9" Y="649.552" Z="38.2594" />
+        <Hotspot X="-9828.59" Y="537.301" Z="34.6537" />
+        <Hotspot X="-9819.96" Y="29.1408" Z="31.6467" />
+        <Hotspot X="-10008.2" Y="207.007" Z="30.6557" />
+        <Hotspot X="-10003.1" Y="274.084" Z="32.554" />
+        <Hotspot X="-9748.02" Y="-25.2635" Z="35.4068" />
+      </Hotspots>
+    </Objective>
+  </Quest>
+  <Quest Id="83" Name="Red Linen Goods">
+    <Objective Type="CollectItem" ItemId="1019" CollectCount="6">
       <Hotspots />
     </Objective>
   </Quest>
-  <Quest Id="54" Name="Report to Goldshire" />
-  <Quest Id="60" Name="Kobold Candles">
-    <Objective Type="CollectItem" ItemId="772" CollectCount="8">
-      <Hotspots />
-    </Objective>
-  </Quest>
-  <Quest Id="85" Name="Lost Necklace" />
   <Quest Id="88" Name="Princess Must Die!">
     <Objective Type="CollectItem" ItemId="1006" CollectCount="1">
       <Hotspots />
     </Objective>
   </Quest>
   <Quest Id="109" Name="Report to Gryan Stoutmantle" />
-  <Quest Id="2158" Name="Rest and Relaxation" />
-  <Quest Id="3903" Name="Milly Osworth" />
+  <Quest Id="46" Name="Bounty on Murlocs">
+    <Objective Type="CollectItem" ItemId="780" CollectCount="8">
+      <Hotspots>
+        <Hotspot X="-9917.74" Y="-847.071" Z="19.9035" />
+        <Hotspot X="-9915.98" Y="-846.381" Z="20.0111" />
+        <Hotspot X="-9893.45" Y="-747.853" Z="20.6947" />
+        <Hotspot X="-9860.71" Y="-711.289" Z="29.0377" />
+        <Hotspot X="-9804.3" Y="-612.081" Z="31.7165" />
+        <Hotspot X="-9911.75" Y="-420.714" Z="26.9035" />
+        <Hotspot X="-9946.99" Y="-281.391" Z="29.242" />
+        <Hotspot X="-9889.43" Y="-442.811" Z="28.3063" />
+        <Hotspot X="-9847.46" Y="-522.908" Z="25.1326" />
+        <Hotspot X="-9846.28" Y="-587.654" Z="21.5072" />
+      </Hotspots>
+    </Objective>
+  </Quest>
   <QuestOrder>
     <PickUp QuestName="Westfall Stew" QuestId="36" GiverName="Verna Furlbrow" GiverId="238" />
-    <PickUp QuestName="Gold Dust Exchange" QuestId="47" GiverName="Remy &quot;Two Times&quot;" GiverId="241" />
-    <PickUp QuestName="Report to Goldshire" QuestId="54" GiverName="Marshal McBride" GiverId="197" />
-    <PickUp QuestName="Kobold Candles" QuestId="60" GiverName="William Pestle" GiverId="253" />
-    <PickUp QuestName="Lost Necklace" QuestId="85" GiverName="&quot;Auntie&quot; Bernice Stonefield" GiverId="246" />
+    <PickUp QuestName="Protect the Frontier" QuestId="52" GiverName="Guard Thomas" GiverId="261" />
+    <PickUp QuestName="Red Linen Goods" QuestId="83" GiverName="Sara Timberlain" GiverId="278" />
     <PickUp QuestName="Princess Must Die!" QuestId="88" GiverName="Ma Stonefield" GiverId="244" />
     <PickUp QuestName="Report to Gryan Stoutmantle" QuestId="109" GiverName="Farmer Saldean" GiverId="233" />
-    <PickUp QuestName="Rest and Relaxation" QuestId="2158" GiverName="Falkhaan Isenstrider" GiverId="6774" />
-    <PickUp QuestName="Milly Osworth" QuestId="3903" GiverName="Deputy Willem" GiverId="823" />
-    <Objective QuestName="Gold Dust Exchange" QuestId="47" Type="CollectItem" ItemId="773" CollectCount="10" MobId="40" />
-    <Objective QuestName="Kobold Candles" QuestId="60" Type="CollectItem" ItemId="772" CollectCount="8" MobId="40" />
+    <PickUp QuestName="Bounty on Murlocs" QuestId="46" GiverName="Guard Thomas" GiverId="261" />
+    <Objective QuestName="Protect the Frontier" QuestId="52" Type="KillMob" MobId="118" KillCount="8" />
+    <Objective QuestName="Protect the Frontier" QuestId="52" Type="KillMob" MobId="822" KillCount="5" />
+    <Objective QuestName="Red Linen Goods" QuestId="83" Type="CollectItem" ItemId="1019" CollectCount="6" MobId="116" />
     <Objective QuestName="Princess Must Die!" QuestId="88" Type="CollectItem" ItemId="1006" CollectCount="1" MobId="330" />
+    <Objective QuestName="Bounty on Murlocs" QuestId="46" Type="CollectItem" ItemId="780" CollectCount="8" MobId="46" />
     <TurnIn QuestName="Westfall Stew" QuestId="36" TurnInName="Salma Saldean" TurnInId="235" />
-    <TurnIn QuestName="Gold Dust Exchange" QuestId="47" TurnInName="Remy &quot;Two Times&quot;" TurnInId="241" />
-    <TurnIn QuestName="Report to Goldshire" QuestId="54" TurnInName="Marshal Dughan" TurnInId="240" />
-    <TurnIn QuestName="Kobold Candles" QuestId="60" TurnInName="William Pestle" TurnInId="253" />
-    <TurnIn QuestName="Lost Necklace" QuestId="85" TurnInName="Billy Maclure" TurnInId="247" />
+    <TurnIn QuestName="Protect the Frontier" QuestId="52" TurnInName="Guard Thomas" TurnInId="261" />
+    <TurnIn QuestName="Red Linen Goods" QuestId="83" TurnInName="Sara Timberlain" TurnInId="278" />
     <TurnIn QuestName="Princess Must Die!" QuestId="88" TurnInName="Ma Stonefield" TurnInId="244" />
     <TurnIn QuestName="Report to Gryan Stoutmantle" QuestId="109" TurnInName="Gryan Stoutmantle" TurnInId="234" />
-    <TurnIn QuestName="Rest and Relaxation" QuestId="2158" TurnInName="Innkeeper Farley" TurnInId="295" />
-    <TurnIn QuestName="Milly Osworth" QuestId="3903" TurnInName="Milly Osworth" TurnInId="9296" />
+    <TurnIn QuestName="Bounty on Murlocs" QuestId="46" TurnInName="Guard Thomas" TurnInId="261" />
   </QuestOrder>
 </HBProfile>
