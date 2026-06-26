@@ -48,6 +48,8 @@ namespace WholesomeAQ
         private bool _wasStuck;
         private bool _stuckLogged;
         private Dictionary<int, int> _deathCountByQuest = new();
+        private Dictionary<int, int> _noHotspotCount = new();
+        private DateTime _lastNoHotspotCheck = DateTime.MinValue;
 
         public override string Name => "Wholesome Auto Quest";
         public override bool RequiresProfile => false;
@@ -412,6 +414,46 @@ namespace WholesomeAQ
                 }
 
                 _lastReadyQuestIds = currentReady;
+            }
+
+            if (TreeRoot.IsRunning && !StyxWoW.Me.Combat
+                && (DateTime.Now - _lastNoHotspotCheck).TotalSeconds >= 2
+                && (DateTime.Now - _lastMovedTime).TotalSeconds >= 10)
+            {
+                _lastNoHotspotCheck = DateTime.Now;
+                var behavior = QuestOrder.Instance?.CurrentBehavior as ForcedQuestObjective;
+                if (behavior?.Objective?.QuestArea?.HotspotsCreated == true)
+                {
+                    var qa = behavior.Objective.QuestArea;
+                    int qId = (int)qa.Quest.Id;
+                    var hs = qa.CurrentHotSpot;
+                    bool noHotspot = hs == null
+                        || (hs.Position.X == 0 && hs.Position.Y == 0 && hs.Position.Z == 0);
+
+                    string questName = qa.Quest.Name;
+
+                    if (noHotspot)
+                    {
+                        _noHotspotCount.TryGetValue(qId, out int count);
+                        count++;
+                        _noHotspotCount[qId] = count;
+
+                        if (count == 5)
+                        {
+                            Log($"No suitable hotspot 5x for {questName} ({qId}) — abandoning and blacklisting");
+                            StyxWoW.Me.QuestLog.AbandonQuestById((uint)qId);
+                            _settings.BlacklistedQuests.Add(qId);
+                            TreeRoot.Stop();
+                        }
+                        else
+                            Log($"No suitable hotspot for {questName} ({qId}) — count #{count}");
+                    }
+                    else
+                    {
+                        if (_noHotspotCount.TryGetValue(qId, out int old) && old > 0)
+                            _noHotspotCount[qId] = 0;
+                    }
+                }
             }
 
             if (_settings.SellWhite || _settings.SellGreen || _settings.SellBlue)
