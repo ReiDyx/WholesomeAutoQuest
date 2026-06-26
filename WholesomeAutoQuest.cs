@@ -112,8 +112,8 @@ namespace WholesomeAQ
                             }
 
                             bool usesMana = StyxWoW.Me.MaxMana > 0;
-                            bool enoughHP = StyxWoW.Me.HealthPercent >= 80;
-                            bool enoughMP = !usesMana || StyxWoW.Me.ManaPercent >= 60;
+                            bool enoughHP = StyxWoW.Me.HealthPercent >= _settings.RestHealthPercent;
+                            bool enoughMP = !usesMana || StyxWoW.Me.ManaPercent >= _settings.RestManaPercent;
 
                             if (enoughHP && enoughMP && elapsed.TotalSeconds >= 3)
                             {
@@ -270,8 +270,8 @@ namespace WholesomeAQ
                 if (!_restingPaused && !StyxWoW.Me.Combat && DateTime.Now > _restTimeoutEnd)
                 {
                     bool usesMana = StyxWoW.Me.MaxMana > 0;
-                    bool lowHealth = StyxWoW.Me.HealthPercent < 80;
-                    bool lowMana = usesMana && StyxWoW.Me.ManaPercent < 60;
+                    bool lowHealth = StyxWoW.Me.HealthPercent < _settings.RestHealthPercent;
+                    bool lowMana = usesMana && StyxWoW.Me.ManaPercent < _settings.RestManaPercent;
 
                     if (lowHealth || lowMana)
                     {
@@ -629,6 +629,15 @@ namespace WholesomeAQ
             var bestDrink = Consumable.GetBestDrink(false);
             if (bestDrink != null)
                 protectedIds.Add(bestDrink.Entry);
+
+            foreach (var item in StyxWoW.Me.BagItems)
+            {
+                if (item.ItemClass == WoWItemClass.Projectile
+                 || item.ItemClass == WoWItemClass.Quiver
+                 || item.ItemClass == WoWItemClass.Reagent
+                 || item.ItemClass == WoWItemClass.Key)
+                    protectedIds.Add(item.Entry);
+            }
 
             MerchantFrame.Instance.SellItemQualities(mask, null, protectedIds);
         }

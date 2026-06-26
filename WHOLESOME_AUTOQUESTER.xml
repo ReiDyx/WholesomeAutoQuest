@@ -18,8 +18,8 @@
     <Vendor Name="Ging" Entry="50033" Type="Train" X="-397.021" Y="-2640.79" Z="96.3062" TrainClass="Warrior" />
     <Vendor Name="Frang" Entry="3153" Type="Train" X="-639.344" Y="-4230.19" Z="38.5605" TrainClass="Warrior" />
   </Vendors>
-  <Quest Id="875" Name="Harpy Lieutenants">
-    <Objective Type="CollectItem" ItemId="5065" CollectCount="6">
+  <Quest Id="876" Name="Serena Bloodfeather">
+    <Objective Type="CollectItem" ItemId="5067" CollectCount="1">
       <Hotspots />
     </Objective>
   </Quest>
@@ -47,14 +47,16 @@
   </Quest>
   <Quest Id="6541" Name="Report to Kadrak" />
   <QuestOrder>
-    <TurnIn QuestName="Harpy Lieutenants" QuestId="875" TurnInName="Darsok Swiftdagger" TurnInId="3449" />
+    <PickUp QuestName="Serena Bloodfeather" QuestId="876" GiverName="Darsok Swiftdagger" GiverId="3449" />
     <PickUp QuestName="Prowlers of the Barrens" QuestId="903" GiverName="Sergra Darkthorn" GiverId="3338" />
     <PickUp QuestName="Stolen Silver" QuestId="3281" GiverName="Gazrog" GiverId="3464" />
     <PickUp QuestName="Lost in Battle" QuestId="4921" GiverName="Mankrik" GiverId="3432" />
     <PickUp QuestName="Report to Kadrak" QuestId="6541" GiverName="Thork" GiverId="3429" />
+    <Objective QuestName="Serena Bloodfeather" QuestId="876" Type="CollectItem" ItemId="5067" CollectCount="1" MobId="3452" />
     <Objective QuestName="Prowlers of the Barrens" QuestId="903" Type="CollectItem" ItemId="5096" CollectCount="7" MobId="3425" />
     <Objective QuestName="Stolen Silver" QuestId="3281" Type="CollectItem" ItemId="5061" CollectCount="1" />
     <Objective QuestName="Lost in Battle" QuestId="4921" Type="KillMob" MobId="10668" KillCount="1" />
+    <TurnIn QuestName="Serena Bloodfeather" QuestId="876" TurnInName="Darsok Swiftdagger" TurnInId="3449" />
     <TurnIn QuestName="Prowlers of the Barrens" QuestId="903" TurnInName="Sergra Darkthorn" TurnInId="3338" />
     <TurnIn QuestName="Stolen Silver" QuestId="3281" TurnInName="Gazrog" TurnInId="3464" />
     <TurnIn QuestName="Lost in Battle" QuestId="4921" TurnInName="Mankrik" TurnInId="3432" />

@@ -15,6 +15,8 @@ namespace WholesomeAQ
         public bool SellWhite { get; set; } = false;
         public bool SellGreen { get; set; } = false;
         public bool SellBlue { get; set; } = false;
+        public int RestHealthPercent { get; set; } = 80;
+        public int RestManaPercent { get; set; } = 60;
         public HashSet<int> BlacklistedQuests { get; set; } = new HashSet<int>();
         public HashSet<int> BlacklistedVendors { get; set; } = new HashSet<int>();
 
