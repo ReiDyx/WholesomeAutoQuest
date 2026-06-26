@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Drawing;
 using System.Windows.Forms;
 using Styx;
 using Styx.Logic.POI;
@@ -55,6 +56,7 @@ namespace WholesomeAQ
         private bool _restingPaused;
         private DateTime _restStartTime = DateTime.MinValue;
         private DateTime _restTimeoutEnd = DateTime.MinValue;
+        private DateTime _lastFacingLog = DateTime.MinValue;
 
         public override string Name => "Wholesome Auto Quest";
         public override bool RequiresProfile => false;
@@ -265,6 +267,20 @@ namespace WholesomeAQ
                     if (TreeRoot.IsPaused)
                         TreeRoot.Resume();
                     return;
+                }
+
+                if (StyxWoW.Me.Combat && StyxWoW.Me.CurrentTarget != null
+                    && StyxWoW.Me.Class != WoWClass.Hunter
+                    && StyxWoW.Me.Class != WoWClass.Mage
+                    && StyxWoW.Me.Class != WoWClass.Priest
+                    && StyxWoW.Me.Class != WoWClass.Warlock
+                    && StyxWoW.Me.LastRedErrorMessage != null
+                    && StyxWoW.Me.LastRedErrorMessage.IndexOf("wrong", StringComparison.OrdinalIgnoreCase) >= 0
+                    && (DateTime.Now - _lastFacingLog).TotalSeconds >= 10)
+                {
+                    Logging.Write(Color.Yellow, "Facing wrong way, rotating");
+                    StyxWoW.Me.SetFacing(StyxWoW.Me.CurrentTarget);
+                    _lastFacingLog = DateTime.Now;
                 }
 
                 if (!_restingPaused && !StyxWoW.Me.Combat && DateTime.Now > _restTimeoutEnd)
