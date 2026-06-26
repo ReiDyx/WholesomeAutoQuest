@@ -300,6 +300,7 @@ namespace WholesomeAQ
 
                         _restStartTime = DateTime.Now;
                         _restingPaused = true;
+                        Navigator.PlayerMover.MoveStop();
                         TreeRoot.Pause();
                         Log($"Rest: HP={StyxWoW.Me.HealthPercent:F0}% MP={StyxWoW.Me.ManaPercent:F0}% — paused{(usedFood ? " (ate)" : "")}{(usedDrink ? " (drank)" : "")}");
                         return;
