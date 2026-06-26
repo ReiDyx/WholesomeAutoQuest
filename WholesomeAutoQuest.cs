@@ -202,6 +202,7 @@ namespace WholesomeAQ
                         }
                         TreeRoot.Start();
                         Log($"Profile refreshed - {_scheduler.LastStatus}");
+                        LogFarAwayQuests();
                     }
                 }
             }
@@ -443,6 +444,7 @@ namespace WholesomeAQ
                             Log($"No suitable hotspot 5x for {questName} ({qId}) — abandoning and blacklisting");
                             StyxWoW.Me.QuestLog.AbandonQuestById((uint)qId);
                             _settings.BlacklistedQuests.Add(qId);
+                            SaveQuestBlacklist();
                             TreeRoot.Stop();
                         }
                         else
@@ -537,6 +539,59 @@ namespace WholesomeAQ
             if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
             return path;
+        }
+
+        private void LogFarAwayQuests()
+        {
+            var db = _dataLoader?.Database;
+            if (db == null || _scheduler?.ActiveQuestIds == null) return;
+
+            foreach (int qId in _scheduler.ActiveQuestIds)
+            {
+                var quest = db.Quests.FirstOrDefault(q => q.Id == qId);
+                if (quest == null) continue;
+
+                var givers = db.QuestGivers.Where(g => g.QuestId == qId).ToList();
+                var enders = db.QuestEnders.Where(e => e.QuestId == qId).ToList();
+                if (givers.Count == 0 || enders.Count == 0) continue;
+
+                foreach (var giver in givers)
+                {
+                    string gKey = giver.GiverId.ToString();
+                    var gSpawns = giver.GiverType == QuestObjectType.GameObject
+                        ? (db.GameObjectSpawns.TryGetValue(gKey, out var gs) ? gs : null)
+                        : (db.CreatureSpawns.TryGetValue(gKey, out var cs) ? cs : null);
+                    if (gSpawns == null || gSpawns.Count == 0) continue;
+
+                    foreach (var ender in enders)
+                    {
+                        string eKey = ender.EnderId.ToString();
+                        var eSpawns = ender.EnderType == QuestObjectType.GameObject
+                            ? (db.GameObjectSpawns.TryGetValue(eKey, out var es) ? es : null)
+                            : (db.CreatureSpawns.TryGetValue(eKey, out var ces) ? ces : null);
+                        if (eSpawns == null || eSpawns.Count == 0) continue;
+
+                        var g0 = gSpawns[0];
+                        var e0 = eSpawns[0];
+
+                        if (g0.Map != e0.Map)
+                        {
+                            Log($"FAR: {quest.Name} ({qId}) — giver {giver.GiverName}({giver.GiverId}) on map {g0.Map}, ender {ender.EnderName}({ender.EnderId}) on map {e0.Map}");
+                        }
+                        else
+                        {
+                            double dx = g0.X - e0.X;
+                            double dy = g0.Y - e0.Y;
+                            double dz = g0.Z - e0.Z;
+                            double dist = Math.Sqrt(dx * dx + dy * dy + dz * dz);
+                            if (dist > 5000.0)
+                            {
+                                Log($"FAR: {quest.Name} ({qId}) — giver {giver.GiverName}({giver.GiverId}) to ender {ender.EnderName}({ender.EnderId}) = {dist:F0}yd");
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         internal void Log(string message)
