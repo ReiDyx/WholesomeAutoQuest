@@ -12,6 +12,7 @@ using Styx.Logic.Inventory.Frames.Merchant;
 using Styx.Logic.Inventory.Frames.Trainer;
 using Styx.Logic.Pathing;
 using Styx.Logic.Profiles;
+using Styx.Combat.CombatRoutine;
 using Styx.WoWInternals;
 using Bots.Quest.QuestOrder;
 using TreeSharp;
@@ -46,6 +47,7 @@ namespace WholesomeAQ
         private bool _pickupLogged;
         private bool _wasStuck;
         private bool _stuckLogged;
+        private Dictionary<int, int> _deathCountByQuest = new();
 
         public override string Name => "Wholesome Auto Quest";
         public override bool RequiresProfile => false;
@@ -127,6 +129,20 @@ namespace WholesomeAQ
             }
 
             base.Start();
+
+            BotEvents.Player.OnPlayerDied -= OnPlayerDied;
+            BotEvents.Player.OnPlayerDied += OnPlayerDied;
+
+            if (StyxWoW.Me != null)
+            {
+                bool ranged = StyxWoW.Me.Class == WoWClass.Hunter
+                    || StyxWoW.Me.Class == WoWClass.Mage
+                    || StyxWoW.Me.Class == WoWClass.Priest
+                    || StyxWoW.Me.Class == WoWClass.Warlock;
+                int dist = ranged ? 30 : 24;
+                CharacterSettings.Instance.PullDistance = dist;
+                Log($"Class {StyxWoW.Me.Class} → PullDistance set to {dist}");
+            }
 
             DoScan();
 
@@ -400,6 +416,31 @@ namespace WholesomeAQ
 
             if (_settings.SellWhite || _settings.SellGreen || _settings.SellBlue)
                 SellByQuality();
+        }
+
+        private void OnPlayerDied()
+        {
+            var behavior = QuestOrder.Instance?.CurrentBehavior as ForcedQuestObjective;
+            if (behavior?.Objective?.QuestArea == null)
+                return;
+
+            int qId = (int)behavior.Objective.QuestArea.Quest.Id;
+            _deathCountByQuest.TryGetValue(qId, out int count);
+            count++;
+            _deathCountByQuest[qId] = count;
+
+            string questName = behavior.Objective.QuestArea.Quest.Name;
+
+            if (count == 5)
+            {
+                Log($"Died {count}x at {questName} ({qId}) — session-blacklisting and refreshing");
+                _settings.BlacklistedQuests.Add(qId);
+                TreeRoot.Stop();
+            }
+            else
+            {
+                Log($"Died near hotspot for {questName} ({qId}) — death #{count}");
+            }
         }
 
         private bool _lastFrameVisible;
