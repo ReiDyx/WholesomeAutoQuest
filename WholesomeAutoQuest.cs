@@ -8,6 +8,8 @@ using Styx.Logic.POI;
 using Styx.Helpers;
 using Styx.Logic.AreaManagement;
 using Styx.Logic.BehaviorTree;
+using Styx.Logic.Common;
+using Styx.Logic.Inventory;
 using Styx.Logic.Inventory.Frames.Merchant;
 using Styx.Logic.Inventory.Frames.Trainer;
 using Styx.Logic.Pathing;
@@ -50,6 +52,9 @@ namespace WholesomeAQ
         private Dictionary<int, int> _deathCountByQuest = new();
         private Dictionary<int, int> _noHotspotCount = new();
         private DateTime _lastNoHotspotCheck = DateTime.MinValue;
+        private bool _restingPaused;
+        private DateTime _restStartTime = DateTime.MinValue;
+        private DateTime _restTimeoutEnd = DateTime.MinValue;
 
         public override string Name => "Wholesome Auto Quest";
         public override bool RequiresProfile => false;
@@ -93,6 +98,43 @@ namespace WholesomeAQ
                 {
                     try
                     {
+                        if (_restingPaused)
+                        {
+                            TimeSpan elapsed = DateTime.Now - _restStartTime;
+
+                            if (StyxWoW.Me.Combat)
+                            {
+                                Log("Combat started — rest done");
+                                _restingPaused = false;
+                                if (TreeRoot.IsPaused)
+                                    TreeRoot.Resume();
+                                return;
+                            }
+
+                            bool usesMana = StyxWoW.Me.MaxMana > 0;
+                            bool enoughHP = StyxWoW.Me.HealthPercent >= 80;
+                            bool enoughMP = !usesMana || StyxWoW.Me.ManaPercent >= 60;
+
+                            if (enoughHP && enoughMP && elapsed.TotalSeconds >= 3)
+                            {
+                                Log($"Rest done — HP={StyxWoW.Me.HealthPercent:F0}% MP={StyxWoW.Me.ManaPercent:F0}%");
+                                _restingPaused = false;
+                                if (TreeRoot.IsPaused)
+                                    TreeRoot.Resume();
+                                return;
+                            }
+
+                            if (elapsed.TotalSeconds >= 30)
+                            {
+                                Log("Rest timeout after 30s — resuming");
+                                _restingPaused = false;
+                                _restTimeoutEnd = DateTime.Now.AddSeconds(10);
+                                if (TreeRoot.IsPaused)
+                                    TreeRoot.Resume();
+                            }
+                            return;
+                        }
+
                         if (_pendingRescan)
                         {
                             _pendingRescan = false;
@@ -214,10 +256,62 @@ namespace WholesomeAQ
 
         public override void Pulse()
         {
+            if (StyxWoW.IsInGame && StyxWoW.Me != null)
+            {
+                if (_restingPaused && StyxWoW.Me.Combat)
+                {
+                    Log("Combat started — rest done");
+                    _restingPaused = false;
+                    if (TreeRoot.IsPaused)
+                        TreeRoot.Resume();
+                    return;
+                }
+
+                if (!_restingPaused && !StyxWoW.Me.Combat && DateTime.Now > _restTimeoutEnd)
+                {
+                    bool usesMana = StyxWoW.Me.MaxMana > 0;
+                    bool lowHealth = StyxWoW.Me.HealthPercent < 80;
+                    bool lowMana = usesMana && StyxWoW.Me.ManaPercent < 60;
+
+                    if (lowHealth || lowMana)
+                    {
+                        bool usedFood = false;
+                        bool usedDrink = false;
+
+                        if (lowHealth && !StyxWoW.Me.HasAura("Food"))
+                        {
+                            var food = Consumable.GetBestFood(false);
+                            if (food != null)
+                            {
+                                Rest.FeedImmediate();
+                                usedFood = true;
+                            }
+                        }
+
+                        if (lowMana && !StyxWoW.Me.HasAura("Drink"))
+                        {
+                            var drink = Consumable.GetBestDrink(false);
+                            if (drink != null)
+                            {
+                                Rest.DrinkImmediate();
+                                usedDrink = true;
+                            }
+                        }
+
+                        _restStartTime = DateTime.Now;
+                        _restingPaused = true;
+                        TreeRoot.Pause();
+                        Log($"Rest: HP={StyxWoW.Me.HealthPercent:F0}% MP={StyxWoW.Me.ManaPercent:F0}% — paused{(usedFood ? " (ate)" : "")}{(usedDrink ? " (drank)" : "")}");
+                        return;
+                    }
+                }
+            }
+
             base.Pulse();
 
             if (StyxWoW.IsInGame && StyxWoW.Me != null && !StyxWoW.Me.Combat && TreeRoot.IsRunning)
             {
+
                 var loc = StyxWoW.Me.Location;
 
                 if (!_anchorSet)
@@ -477,8 +571,9 @@ namespace WholesomeAQ
 
             if (count == 5)
             {
-                Log($"Died {count}x at {questName} ({qId}) — session-blacklisting and refreshing");
+                Log($"Died {count}x at {questName} ({qId}) — blacklisting and refreshing");
                 _settings.BlacklistedQuests.Add(qId);
+                SaveQuestBlacklist();
                 TreeRoot.Stop();
             }
             else
@@ -527,6 +622,13 @@ namespace WholesomeAQ
                     }
                 }
             }
+
+            var bestFood = Consumable.GetBestFood(false);
+            if (bestFood != null)
+                protectedIds.Add(bestFood.Entry);
+            var bestDrink = Consumable.GetBestDrink(false);
+            if (bestDrink != null)
+                protectedIds.Add(bestDrink.Entry);
 
             MerchantFrame.Instance.SellItemQualities(mask, null, protectedIds);
         }
