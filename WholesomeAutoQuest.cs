@@ -574,20 +574,15 @@ namespace WholesomeAQ
                         var g0 = gSpawns[0];
                         var e0 = eSpawns[0];
 
-                        if (g0.Map != e0.Map)
+                        double dx = g0.X - e0.X;
+                        double dy = g0.Y - e0.Y;
+                        double dz = g0.Z - e0.Z;
+                        double dist = Math.Sqrt(dx * dx + dy * dy + dz * dz);
+                        if (dist > 5000.0)
                         {
-                            Log($"FAR: {quest.Name} ({qId}) — giver {giver.GiverName}({giver.GiverId}) on map {g0.Map}, ender {ender.EnderName}({ender.EnderId}) on map {e0.Map}");
-                        }
-                        else
-                        {
-                            double dx = g0.X - e0.X;
-                            double dy = g0.Y - e0.Y;
-                            double dz = g0.Z - e0.Z;
-                            double dist = Math.Sqrt(dx * dx + dy * dy + dz * dz);
-                            if (dist > 5000.0)
-                            {
-                                Log($"FAR: {quest.Name} ({qId}) — giver {giver.GiverName}({giver.GiverId}) to ender {ender.EnderName}({ender.EnderId}) = {dist:F0}yd");
-                            }
+                            string extra = g0.Map != e0.Map
+                                ? $" (different maps: {g0.Map} vs {e0.Map})" : "";
+                            Log($"FAR: {quest.Name} ({qId}) — giver {giver.GiverName}({giver.GiverId}) to ender {ender.EnderName}({ender.EnderId}) = {dist:F0}yd{extra}");
                         }
                     }
                 }
