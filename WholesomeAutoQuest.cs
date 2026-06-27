@@ -291,6 +291,9 @@ namespace WholesomeAQ
 
                     if (lowHealth || lowMana)
                     {
+                        if (StyxWoW.Me.Dead || StyxWoW.Me.IsGhost)
+                            return;
+                            
                         bool usedFood = false;
                         bool usedDrink = false;
 

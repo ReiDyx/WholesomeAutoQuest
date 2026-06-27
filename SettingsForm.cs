@@ -37,7 +37,7 @@ namespace WholesomeAQ
             _resume = resume;
             _saveQuestBlacklist = saveQuestBlacklist;
             Text = "Wholesome Auto Quest Settings";
-            Size = new Size(350, 520);
+            Size = new Size(350, 580);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
